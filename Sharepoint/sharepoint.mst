@@ -17,7 +17,7 @@
                 "members": [
                     {
                         "addressDiscovery": "static",
-                        "servicePort": 80,
+                        "servicePort": {{port::integer}},
                         "serverAddresses": {{server_addresses::array}}
                     }
                 ],
@@ -55,7 +55,7 @@
                 "virtualAddresses": [
                     "{{virtual_address}}"
                 ],
-                "virtualPort": 8080,
+                "virtualPort": {{vsport::integer}},
                 "persistenceMethods": [],
                 "snat": "auto"
             },
