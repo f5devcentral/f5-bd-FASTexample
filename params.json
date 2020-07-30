@@ -1,0 +1,9 @@
+{
+  "tenant_name": "TestTenant",
+  "application_name": "MyTestApp",
+  "virtual_address": "0.0.0.0",
+  "server_addresses": [
+    "10.0.0.1",
+    "10.0.0.2"
+  ]
+}

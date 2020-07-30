@@ -1,0 +1,105 @@
+{
+  "class": "AS3",
+  "action": "deploy",
+  "persist": true,
+  "declaration": {
+    "class": "ADC",
+    "schemaVersion": "3.11.0",
+    "id": "urn:uuid:2c8b29bb-f318-4631-961a-94baea550b36",
+    "label": "Sample 1",
+    "remark": "This is Sharepoint Application objects for tenant",
+    "{{tenant_name}}": {
+        "class": "Tenant",
+        "{{application_name}}": {
+            "class": "Application",
+            "template": "http",
+            "sharepoint-pool": {
+                "members": [
+                    {
+                        "addressDiscovery": "static",
+                        "servicePort": 80,
+                        "serverAddresses": {{server_addresses::array}}
+                    }
+                ],
+                "monitors": [{
+                     "use": "/{{tenant_name}}/{{application_name}}/sharepoint-monitor"
+                }],
+                "class": "Pool"
+            },
+            "serviceMain": {
+                "layer4": "tcp",
+                "pool": "sharepoint-pool",
+                "translateServerAddress": true,
+                "translateServerPort": true,
+                "class": "Service_HTTP",
+                "profileHTTPAcceleration": {
+                    "use": "sharepoint-cache-optimize"
+                },
+                "profileHTTP": {
+                    "use": "sharepoint-http"
+                },
+                "profileHTTPCompression": {
+                    "use": "sharepoint-httpcompression"
+                },
+                "profileMultiplex": {
+                    "use": "sharepoint-oneconnect"
+                },
+                "profileTCP": {
+                    "egress": {
+                        "use": "sharepoint-tcp-lan"
+                    },
+                    "ingress": {
+                        "use": "sharepoint-tcp-wan"
+                    }
+                },
+                "virtualAddresses": [
+                    "{{virtual_address}}"
+                ],
+                "virtualPort": 8080,
+                "persistenceMethods": [],
+                "snat": "auto"
+            },
+            "sharepoint-monitor": {
+                "adaptive": false,
+                "interval": 5,
+                "dscp": 0,
+                "send": "GET /\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 16,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "sharepoint-http": {
+                "proxyType": "reverse",
+                "class": "HTTP_Profile"
+            },
+            "sharepoint-httpcompression": {
+                "class": "HTTP_Compress"
+            },
+            "sharepoint-oneconnect": {
+                "class": "Multiplex_Profile",
+                "maxConnections": 5000,
+                "maxConnectionAge": 3600,
+                "maxConnectionReuse": 20000,
+                "idleTimeoutOverride": 900,
+                "connectionLimitEnforcement": "idle",
+                "sharePools": true
+            },
+            "sharepoint-tcp-lan": {
+                "class": "TCP_Profile"
+            },
+            "sharepoint-tcp-wan": {
+                "class": "TCP_Profile"
+            },
+            "sharepoint-cache-optimize": {
+                "parentProfile": {
+                    "bigip": "/Common/optimized-caching"
+                },
+                "class": "HTTP_Acceleration_Profile"
+            }
+            }
+        }
+    }
+}
