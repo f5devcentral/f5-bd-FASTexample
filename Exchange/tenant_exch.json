@@ -1,0 +1,230 @@
+{
+  "class": "AS3",
+  "action": "deploy",
+  "persist": true,
+  "declaration": {
+    "class": "ADC",
+    "schemaVersion": "3.11.0",
+    "id": "urn:uuid:2c8b29bb-f318-4631-961a-94baea550b36",
+    "label": "Sample 1",
+    "remark": "This is Sharepoint Application objects for tenant",
+    "TestTenant": {
+        "class": "Tenant",
+        "MyTestApp": {
+            "class": "Application",
+            "template": "https",
+            "ExchangeVS_ad_pool3": {
+                "loadBalancingMode": "least-connections-member",
+                "monitors": [{
+                     "use": "/TestTenant/MyTestApp/ExchangeVS_ad_http_monitor"
+                }],
+                "class": "Pool"
+            },
+            "ExchangeVS_as_pool3": {
+                "loadBalancingMode": "least-connections-member",
+                "monitors": [{
+                     "use": "/TestTenant/MyTestApp/ExchangeVS_as_http_monitor"
+                }],
+                "class": "Pool"
+            },
+            "ExchangeVS_ews_pool3": {
+                "loadBalancingMode": "least-connections-member",
+                "monitors": [{
+                     "use": "/TestTenant/MyTestApp/ExchangeVS_ews_http_monitor"
+                }],
+                "class": "Pool"
+            },
+            "ExchangeVS_mapi_pool3": {
+                "loadBalancingMode": "least-connections-member",
+                "monitors": [{
+                     "use": "/TestTenant/MyTestApp/ExchangeVS_mapi_http_monitor"
+                }],
+                "class": "Pool"
+            },
+            "ExchangeVS_owa_pool3": {
+                "loadBalancingMode": "least-connections-member",
+                "monitors": [{
+                     "use": "/TestTenant/MyTestApp/ExchangeVS_owa_http_monitor"
+                }],
+                "class": "Pool"
+            },
+
+            "ExchangeVS_combined_pool_irule3": {
+                "class": "iRule",
+                "iRule": "when HTTP_REQUEST {\n    switch -glob -- [string tolower [HTTP::path]] {\n        \"/microsoft-server-activesync*\" {\n            TCP::idletime 1800\n            pool /TestTenant/MyTestApp/ExchangeVS_as_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/owa*\" {\n            \n            pool /TestTenant/MyTestApp/ExchangeVS_owa_pool3\n            return\n        }\n        \"/ecp*\" {\n            \n            pool /TestTenant/MyTestApp/ExchangeVS_owa_pool3\n            return\n        }\n        \"/ews*\" {\n            pool /TestTenant/MyTestApp/ExchangeVS_ews_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/oab*\" {\n            pool /TestTenant/MyTestApp/ExchangeVS_ews_pool3\n            persist none\n            return\n        }\n        \"/mapi*\" {\n            pool /TestTenant/MyTestApp/ExchangeVS_mapi_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n         }\n        \"/rpc/rpcproxy.dll*\" {\n            \n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/autodiscover*\" {\n            pool /TestTenant/MyTestApp/ExchangeVS_ad_pool3\n            persist none\n            return\n        }\n        default {\n            pool /TestTenant/MyTestApp/ExchangeVS_owa_pool3\n        }\n    }\n}\nwhen HTTP_RESPONSE {\n    if { ( [HTTP::header exists \"WWW-Authenticate\"] &&\n        [string tolower [HTTP::header values \"WWW-Authenticate\"]] contains \"negotiate\" ) ||\n        ( [HTTP::header exists \"Persistent-Auth\"] &&\n        [string tolower [HTTP::header \"Persistent-Auth\"]] contains \"true\" ) } {\n        ONECONNECT::reuse disable\n        ONECONNECT::detach disable\n        NTLM::disable\n   }\n   if {[HTTP::header exists \"Transfer-Encoding\"]} {\n        HTTP::payload rechunk\n   }\n}"
+            },
+            "ExchangeVS_owa_redirect_irule3": {
+                "class": "iRule",
+                "iRule": "priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
+            },
+
+            "webtls": {
+              "class": "TLS_Server",
+              "certificates": [{
+              "certificate": "webcert"
+               }]
+               },
+
+                "webcert": {
+          "class": "Certificate",
+          "remark": "in practice we recommend using a passphrase",
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIICnDCCAgWgAwIBAgIJAJ5n2b0OCEjwMA0GCSqGSIb3DQEBCwUAMGcxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApXYXNoaW5ndG9uMRAwDgYDVQQHDAdTZWF0dGxlMRQwEgYDVQQKDAtmNV9OZXR3b3JrczEbMBkGA1UEAwwSc2FtcGxlLmV4YW1wbGUubmV0MB4XDTE3MTEyNjE5NTAyNFoXDTE4MDIyNTE5NTAyNFowZzELMAkGA1UEBhMCVVMxEzARBgNVBAgMCldhc2hpbmd0b24xEDAOBgNVBAcMB1NlYXR0bGUxFDASBgNVBAoMC2Y1X05ldHdvcmtzMRswGQYDVQQDDBJzYW1wbGUuZXhhbXBsZS5uZXQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALEsuXmSXVQpYjrZPW+WiTBjn491mwZYT7Q92V1HlSBtM6WdWlK1aZN5sovfKtOX7Yrm8xa+e4o/zJ2QYLyyv5O+t2EGN/4qUEjEAPY9mwJdfzRQy6Hyzm84J0QkTuUJ/EjNuPji3D0QJRALUTzu1UqqDCEtiN9OGyXEkh7uvb7BAgMBAAGjUDBOMB0GA1UdDgQWBBSVHPNrGWrjWyZvckQxFYWO59FRFjAfBgNVHSMEGDAWgBSVHPNrGWrjWyZvckQxFYWO59FRFjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4GBAJeJ9SEckEwPhkXOm+IuqfbUS/RcziifBCTmVyE+Fa/j9pKSYTgiEBNdbJeBEa+gPMlQtbV7Y2dy8TKx/8axVBHiXC5geDML7caxOrAyHYBpnx690xJTh5OIORBBM/a/NvaR+P3CoVebr/NPRh9oRNxnntnqvqD7SW0U3ZPe3tJc\n-----END CERTIFICATE-----",
+          "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: AES-256-CBC,D8FFCE6B255601587CB54EC29B737D31\n\nkv4Fc3Jn0Ujkj0yRjt+gQQfBLSNF2aRLUENXnlr7Xpzqu0Ahr3jS1bAAnd8IWnsR\nyILqVmKsYF2DoHh0tWiEAQ7/y/fe5DTFhK7N4Wml6kp2yVMkP6KC4ssyYPw27kjK\nDBwBZ5O8Ioej08A5sgsLCmglbmtSPHJUn14pQnMTmLOpEtOsu6S+2ibPgSNpdg0b\nCAJNG/KHe+Vkx59qNDyDeKb7FZOlsX30+y67zUq9GQqJEDuysPJ2BUNP0IJXAjst\nFIt1qNoZew+5KDYs7u/lPxcMGTirUhgI84Jy4WcDvSOsP/tKlxj04TbIE3epmSKy\n+TihHkwY7ngIGtcm3Sfqk5jz2RXoj1/Ac3SW8kVTYaOUogBhn7zAq4Wju6Et4hQG\nRGapsJp1aCeZ/a4RCDTxspcKoMaRa97/URQb0hBRGx3DGUhzpmX9zl7JI2Xa5D3R\nmdBXtjLKYJTdIMdd27prBEKhMUpae2rz5Mw4J907wZeBq/wu+zp8LAnecfTe2nGY\nE32x1U7gSEdYOGqnwxsOexb1jKgCa67Nw9TmcMPV8zmH7R9qdvgxAbAtwBl1F9OS\nfcGaC7epf1AjJLtaX7krWmzgASHl28Ynh9lmGMdv+5QYMZvKG0LOg/n3m8uJ6sKy\nIzzvaJswwn0j5P5+czyoV5CvvdCfKnNb+3jUEN8I0PPwjBGKr4B1ojwhogTM248V\nHR69D6TxFVMfGpyJhCPkbGEGbpEpcffpgKuC/mEtMqyDQXJNaV5HO6HgAJ9F1P6v\n5ehHHTMRvzCCFiwndHdlMXUjqSNjww6me6dr6LiAPbejdzhL2vWx1YqebOcwQx3G\n-----END RSA PRIVATE KEY-----",
+          "passphrase": {
+            "ciphertext": "ZjVmNQ==",
+            "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0"
+          }
+      },
+
+
+            "serviceMain": {
+                "layer4": "tcp",
+                "translateServerAddress": true,
+                "serverTLS": "webtls",
+                "translateServerPort": true,
+                "class": "Service_HTTPS",
+                "iRules": [
+                    {
+                        "use": "/TestTenant/MyTestApp/ExchangeVS_owa_redirect_irule3"
+                    },
+                    {
+                        "use": "/TestTenant/MyTestApp/ExchangeVS_combined_pool_irule3"
+                    }
+                ],
+                "profileHTTPAcceleration": {
+                    "use": "ExchangeVS-cache-optimize"
+                },
+                "profileHTTP": {
+                    "use": "ExchangeVS-http"
+                },
+                "profileHTTPCompression": {
+                    "use": "ExchangeVS-httpcompression"
+                },
+                "profileMultiplex": {
+                    "use": "ExchangeVS-oneconnect"
+                },
+                "profileTCP": {
+                    "egress": {
+                        "use": "ExchangeVS-tcp-lan"
+                    },
+                    "ingress": {
+                        "use": "ExchangeVS-tcp-wan"
+                    }
+                },
+                "virtualAddresses": [
+                    "100.1.1.100"
+                ],
+                "virtualPort": 443,
+                "persistenceMethods": [],
+                "snat": "auto"
+            },
+            "ExchangeVS_ad_http_monitor": {
+                "adaptive": false,
+                "interval": 10,
+                "dscp": 0,
+                "receive": "200 OK",
+                "send": "GET /autodiscover/healthcheck.htm HTTP/1.1\\r\\nHost: f5.bd.com\\r\\nConnection: Close\\r\\n\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 31,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "ExchangeVS_as_http_monitor": {
+                "adaptive": false,
+                "interval": 10,
+                "dscp": 0,
+                "receive": "200 OK",
+                "send": "GET /Microsoft-Server-Activesync/healthcheck.htm HTTP/1.1\\r\\nHost: f5.bd.com\\r\\nConnection: Close\\r\\n\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 31,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "ExchangeVS_ews_http_monitor": {
+                "adaptive": false,
+                "interval": 10,
+                "dscp": 0,
+                "receive": "200 OK",
+                "send": "GET /EWS/healthcheck.htm HTTP/1.1\\r\\nHost: f5.bd.com\\r\\nConnection: Close\\r\\n\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 31,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "ExchangeVS_mapi_http_monitor": {
+                "adaptive": false,
+                "interval": 10,
+                "dscp": 0,
+                "receive": "200 OK",
+                "send": "GET /mapi/healthcheck.htm HTTP/1.1\\r\\nHost: f5.bd.com\\r\\nConnection: Close\\r\\n\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 31,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "ExchangeVS_owa_http_monitor": {
+                "adaptive": false,
+                "interval": 10,
+                "dscp": 0,
+                "receive": "200 OK",
+                "send": "GET /owa/healthcheck.htm HTTP/1.1\\r\\nHost: f5.bd.com\\r\\nConnection: Close\\r\\n\\r\\n",
+                "timeUntilUp": 0,
+                "timeout": 31,
+                "class": "Monitor",
+                "monitorType": "http",
+                "targetAddress": "",
+                "targetPort": 0
+            },
+            "ExchangeVS-http": {
+                "proxyType": "reverse",
+                "class": "HTTP_Profile"
+            },
+            "ExchangeVS-httpcompression": {
+                "contentTypeIncludes": [
+                    "application/(xml|x-javascript)"
+                ],
+                "class": "HTTP_Compress"
+            },
+            "ExchangeVS-oneconnect": {
+                "class": "Multiplex_Profile",
+                "maxConnections": 5000,
+                "maxConnectionAge": 3600,
+                "maxConnectionReuse": 20000,
+                "idleTimeoutOverride": 900,
+                "connectionLimitEnforcement": "idle",
+                "sharePools": true
+            },
+             
+            "ExchangeVS-tcp-lan": {
+                "idleTimeout": 2100,
+                "class": "TCP_Profile"
+            },
+            "ExchangeVS-tcp-wan": {
+                "idleTimeout": 2100,
+                "class": "TCP_Profile"
+            },
+            "ExchangeVS-cache-optimize": {
+                "uriExcludeList": [
+                    "/owa/ev.owa",
+                    "oab.xml"
+                ],
+                "uriIncludeList": [
+                    ".*"
+                ],
+                "parentProfile": {
+                    "bigip": "/Common/optimized-caching"
+                },
+                "class": "HTTP_Acceleration_Profile"
+            }
+            }
+        }
+    }
+}
