@@ -1,6 +1,7 @@
 {
   "tenant_name": "TestTenant",
   "application_name": "MyTestApp",
+  "application_fqdn": "www.myapp.com",
   "virtual_address": "0.0.0.0",
   "port": 80,
   "certificate": "-----BEGIN CERTIFICATE-----\nMIICnDCCAgWgAwIBAgIJAJ5n2b",
