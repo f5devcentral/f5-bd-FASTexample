@@ -92,6 +92,24 @@
                   "class": "iRule",
                   "iRule": "priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
               },
+              "webtls": {
+                "class": "TLS_Server",
+                "certificates": [{
+                "certificate": "webcert"
+                 }]
+                 },
+
+            "webcert": {
+            "class": "Certificate",
+            "remark": "in practice we recommend using a passphrase",
+            "certificate": "-----BEGIN CERTIFICATE-----
+  MIICnDCCAgWgAwIBAgIJAJ5n2b",
+            "privateKey": "",
+            "passphrase": {
+              "ciphertext": "ZjVmNQ==",
+              "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0"
+            }
+        },
               "serviceMain": {
                   "layer4": "tcp",
                   "translateServerAddress": true,
