@@ -23,7 +23,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/TestTenant/MyTestApp/ExchangeVS_ad_http_monitor"
+                       "use": "/ExchTenant/ExchApp/ExchangeVS_ad_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -37,7 +37,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/TestTenant/MyTestApp/ExchangeVS_as_http_monitor"
+                       "use": "/ExchTenant/ExchApp/ExchangeVS_as_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -51,7 +51,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/TestTenant/MyTestApp/ExchangeVS_ews_http_monitor"
+                       "use": "/ExchTenant/ExchApp/ExchangeVS_ews_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -65,7 +65,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/TestTenant/MyTestApp/ExchangeVS_mapi_http_monitor"
+                       "use": "/ExchTenant/ExchApp/ExchangeVS_mapi_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -79,7 +79,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/TestTenant/MyTestApp/ExchangeVS_owa_http_monitor"
+                       "use": "/ExchTenant/ExchApp/ExchangeVS_owa_http_monitor"
                   }],
                   "class": "Pool"
               },
