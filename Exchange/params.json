@@ -1,0 +1,14 @@
+{
+  "tenant_name": "ExchTenant",
+  "application_name": "ExchApp",
+  "application_fqdn": "mail.mycompany.com",
+  "virtual_address": "0.0.0.0",
+  "port": 443,
+  "vsport": 443,
+  "certificate": "-----BEGIN CERTIFICATE-----\nMIICnDCCAgWgAwIBAgIJAJ5n2b",
+  "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,",
+  "server_addresses": [
+    "10.0.0.1",
+    "10.0.0.2"
+  ]
+}
