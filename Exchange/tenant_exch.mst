@@ -6,8 +6,8 @@
       "class": "ADC",
       "schemaVersion": "3.11.0",
       "id": "urn:uuid:2c8b29bb-f318-4631-961a-94baea550b36",
-      "label": "Sample 1",
-      "remark": "This is Sharepoint Application objects for tenant",
+      "label": "Exchange single VIP application",
+      "remark": "This is Exchange 2016 Application objects for tenant",
       "{{tenant_name}}": {
           "class": "Tenant",
           "{{application_name}}": {
@@ -22,8 +22,8 @@
                           "serverAddresses":  {{server_addresses::array}}
                       }
                   ],
-                  "monitors": [{
-                       "use": "/{{tenant_name}}/{{application_name}}/ExchangeVS_ad_http_monitor"
+	          "monitors": [{
+                       "use": "/TestTenant/MyTestApp/ExchangeVS_ad_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -37,7 +37,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/{{tenant_name}}/{{application_name}}/ExchangeVS_as_http_monitor"
+                       "use": "/TestTenant/MyTestApp/ExchangeVS_as_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -51,7 +51,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/{{tenant_name}}/{{application_name}}/ExchangeVS_ews_http_monitor"
+                       "use": "/TestTenant/MyTestApp/ExchangeVS_ews_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -65,7 +65,7 @@
                       }
                   ],
                   "monitors": [{
-                       "use": "/{{tenant_name}}/{{application_name}}/ExchangeVS_mapi_http_monitor"
+                       "use": "/TestTenant/MyTestApp/ExchangeVS_mapi_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -77,9 +77,9 @@
                           "servicePort":  {{port::integer}},
                           "serverAddresses":  {{server_addresses::array}}
                       }
-                  ],
-                  "monitors": [{
-                       "use": "/{{tenant_name}}/{{application_name}}/ExchangeVS_owa_http_monitor"
+                  ],                  
+		  "monitors": [{
+                       "use": "/TestTenant/MyTestApp/ExchangeVS_owa_http_monitor"
                   }],
                   "class": "Pool"
               },
@@ -92,24 +92,7 @@
                   "class": "iRule",
                   "iRule": "priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
               },
-            "webtls": {
-              "class": "TLS_Server",
-              "certificates": [{
-              "certificate": "webcert"
-               }]
-               },
-
-                "webcert": {
-          "class": "Certificate",
-          "remark": "in practice we recommend using a passphrase",
-          "certificate": "{{certificate}}",
-          "privateKey": "{{private_key}}",
-          "passphrase": {
-            "ciphertext": "ZjVmNQ==",
-            "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0"
-          }
-        },
-             "serviceMain": {
+              "serviceMain": {
                   "layer4": "tcp",
                   "translateServerAddress": true,
                   "serverTLS": "webtls",
@@ -260,3 +243,4 @@
           }
       }
   }
+
