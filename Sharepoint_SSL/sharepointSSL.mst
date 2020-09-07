@@ -36,12 +36,8 @@
                 "webcert": {
           "class": "Certificate",
           "remark": "in practice we recommend using a passphrase",
-          "certificate": "{{certificate}}",
-          "privateKey": "{{private_key}}",
-          "passphrase": {
-            "ciphertext": "ZjVmNQ==",
-            "protected": "eyJhbGciOiJkaXIiLCJlbmMiOiJub25lIn0"
-          }
+          "certificate": {{certificate::text}},
+          "privateKey": {{privateKey::text}}
       },
             "serviceMain": {
                 "layer4": "tcp",
