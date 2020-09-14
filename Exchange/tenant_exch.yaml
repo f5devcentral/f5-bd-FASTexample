@@ -1,0 +1,715 @@
+definitions:
+  tenant_name:
+    title: What is the tenant name?
+    description: The tenant is the high-level grouping in an AS3 declaration. FAST deploys all configuration for a given tenant in a BIG-IP partition of the same name.
+  app_name:
+    title: What is the application name?
+    description: The application is the low-level grouping in an AS3 declaration. FAST deploys all configuration for a given application in a BIG-IP folder within the tenant partition.
+  virtual_address:
+    title: What IP address do you want to use for the virtual server?
+    description: This IP address, combined with the port you specify below, becomes the BIG-IP virtual server address and port, which clients use to access the application. The system uses this IP:Port for distributing requests to the web servers.
+  virtual_port:
+    title: What TCP port do you want to use for the virtual server?
+  enable_redirect:
+    title: Redirect port 80 traffic to this virtual server
+    type: boolean
+  enable_pool:
+    title: Create Pool
+    description: A pool is a logical set of devices, such as web servers, that you group together to receive and process traffic.
+    type: boolean
+  make_pool:
+    title: Automatically manage the pool
+    description: A load balancing pool is a logical set of devices, such as web servers, grouped together to receive and process traffic. When clients attempt to access the application via the BIG-IP virtual server, the BIG-IP system distributes requests to any of the servers that are members of that pool.
+    type: boolean
+  pool_name:
+    title: Specify the name of an existing BIG-IP pool.
+    enumFromBigip: 'ltm/pool'
+  pool_members:
+    title: Server Addresses
+    description: Add the IP addresses of a pool member.
+  pool_port:
+    title: What TCP port do you want to use for the pool members?
+  load_balancing_mode:
+    title: Which load balancing method do you want to use?
+    description: A load balancing method is an algorithm that the BIG-IP system uses to select a pool member for processing a request. F5 recommends the Least Connections load balancing method, where new connections are routed to the node that has the least number of current connections. This is ideal for environments in which pool members have similar performance and capacity capabilities.
+  slow_ramp_time:
+    title: What slow ramp time do you want to use? (recommended value is 300 seconds)
+    description:  Slowly increases the number of connection requests that are load balanced to a new pool member.
+  enable_monitor:
+    title: Pool Monitor
+    description: Determine the availability and performance of devices, links, and services on a network.
+    type: boolean
+  make_monitor:
+    title: Automatically manage the pool monitor
+    type: boolean
+  monitor_name:
+    title: Specify the name of an existing BIG-IP monitor.
+    description: Monitors are used to determine the health of the application on each web server. If an application instance does not respond or responds incorrectly, the system will cease to send client requests to that web server. The system will continue to monitor the instance and will begin sending requests once the application responds correctly.
+    enumFromBigip: 'ltm/monitor/tcp'
+  enable_snat:
+    title: SNAT
+    description: Secure Network Address Translation maps the source client IP address in a request to a translation address defined on the BIG-IP device.
+    type: boolean
+  snat_automap:
+    title: SNAT Automap
+    description: SNAT automap uses BIG-IP self IP addresses as the translation address.
+    type: boolean
+  make_snatpool:
+    title: Automatically manage the SNAT pool.
+    type: boolean
+  snatpool_name:
+    title: Specify the name of an existing BIG-IP SNAT pool.
+    enumFromBigip: 'ltm/snatpool'
+  snat_addresses:
+    title: SNAT Pool Addresses
+  enable_persistence:
+    title: Persistence
+    description: Ensures that client requests are directed to the same pool member throughout the life of a session or during subsequent sessions.
+    type: boolean
+  persistence_type:
+    title: Specify the type of persistence.
+  enable_fallback_persistence:
+    title: Fallback Persistence
+    description: Create a secondary, or fallback, persistence record for each new client connection.
+    type: boolean
+  fallback_persistence_type:
+    title: Specify the type of fallback persistence.
+  common_tcp_profile:
+    title: Use the same TCP profile for ingress and egress traffic.
+    type: boolean
+  make_tcp_profile:
+    title: Automatically manage the TCP profile.
+    type: boolean
+  tcp_topology:
+    title: Specify the type of network that connects both clients and servers to the BIG-IP system.
+  tcp_profile_name:
+    title: Specify the name of an existing BIG-IP TCP profile.
+    enumFromBigip: 'ltm/profile/tcp'
+  enable_tls_server:
+    title: TLS Server
+    description: Enable TLS server to decrypt client-side connections.
+    type: boolean
+  make_tls_server_profile:
+    title: Automatically manage the TLS server profile
+    type: boolean
+  tls_server_profile_name:
+    title: Specify the name of an existing BIG-IP clientssl profile.
+    description: TLS server profiles are of type "ltm clientssl" on BIG-IP.
+    enumFromBigip: 'ltm/profile/client-ssl'
+  tls_cert_name:
+    title: Specify the name of an existing BIG-IP SSL certificate.
+    enumFromBigip: 'sys/crypto/cert'
+  tls_key_name:
+    title: Specify the name of an existing BIG-IP SSL key.
+    enumFromBigip: 'sys/crypto/key'
+  enable_tls_client:
+    title: TLS Client
+    description: Enable TLS client to encrypt server-side connections.
+    type: boolean
+  make_tls_client_profile:
+    title: Automatically manage the TLS client profile
+    type: boolean
+  tls_client_profile_name:
+    title: Specify the name of an existing BIG-IP serverssl profile.
+    description: TLS client profiles are of type "ltm serverssl" on BIG-IP.
+    enumFromBigip: 'ltm/profile/server-ssl'
+  make_tcp_ingress_profile:
+    title: Automatically manage the ingress TCP profile
+    type: boolean
+  tcp_ingress_topology:
+    title: Specify the type of network that connects clients to the BIG-IP system
+  tcp_ingress_profile_name:
+    title: Specify the name of an existing BIG-IP TCP profile for client-side context.
+    enumFromBigip: 'ltm/profile/tcp'
+  make_tcp_egress_profile:
+    title: Automatically manage the egress TCP profile
+    type: boolean
+  tcp_egress_topology:
+    title: Specify the type of network that connects servers to the BIG-IP system
+  tcp_egress_profile_name:
+    title: Specify the name of an existing BIG-IP TCP profile for server-side context.
+    enumFromBigip: 'ltm/profile/tcp'
+  make_http_profile:
+    title: Automatically manage the HTTP profile
+    type: boolean
+  http_profile_name:
+    title: Specify the name of an existing BIG-IP HTTP profile.
+    enumFromBigip: 'ltm/profile/http'
+  x_forwarded_for:
+    title: Insert the x-forwarded-for header
+    description: Inserts the original client IP address in an HTTP header and configures the web server receiving the request to log the client IP address instead of the SNAT address.
+  enable_acceleration:
+    title: Web Acceleration or Caching
+    description: Web Acceleration or web caching will be enabled depending on the BIG-IP license.
+    type: boolean
+  make_acceleration_profile:
+    title: Automatically manage the Web Acceleration profile
+    type: boolean
+  acceleration_profile_name:
+    title: Specify the name of an existing BIG-IP web acceleration profile.
+    enumFromBigip: 'ltm/profile/web-acceleration'
+  enable_compression:
+    title: HTTP Compression
+    type: boolean
+  make_compression_profile:
+    title: Automatically manage the HTTP Compression profile
+    type: boolean
+  compression_profile_name:
+    title: Specify the name of an existing BIG-IP HTTP compression profile.
+    enumFromBigip: 'ltm/profile/http-compression'
+  enable_multiplex:
+    title: Connection Multiplexing
+    description: Works with HTTP Keep-Alives to allow the BIG-IP system to minimize the number of server-side TCP connections by making existing connections available for reuse by other clients.
+    type: boolean
+  make_multiplex_profile:
+    title: Automatically manage the Multiplex (OneConnect) profile
+    type: boolean
+  multiplex_profile_name:
+    title: Specify the name of an existing BIG-IP OneConnect profile
+    enumFromBigip: 'ltm/profile/one-connect'
+  app_pool_def:
+    template: |
+      {{#enable_pool}}
+        {{#make_pool}}
+          "{{app_name:f5:bigip_name}}_pool": {
+            "class": "Pool",
+            "members": [{
+              "serverAddresses": {{pool_members:f5:ipv4_array}},
+              "servicePort": {{pool_port:f5:port}},
+              "shareNodes": true
+            }],
+            "loadBalancingMode": "{{load_balancing_mode:f5:load_balancing_mode}}",
+            "slowRampTime": {{slow_ramp_time::integer}},
+            {{#enable_monitor}}
+              {{#make_monitor}}
+                "monitors": [ "tcp" ]
+              {{/make_monitor}}
+              {{^make_monitor}}
+                "monitors": [{
+                  "bigip": "{{monitor_name:f5:bigip_path}}"
+                }]
+              {{/make_monitor}}
+            {{/enable_monitor}}
+          },
+        {{/make_pool}}
+      {{/enable_pool}}
+  app_snatpool_def:
+    template: |
+      {{#enable_snat}}
+        {{^snat_automap}}
+          {{#make_snatpool}}
+            "{{app_name:f5:bigip_name}}_snatpool": {
+              "class": "SNAT_Pool",
+              "snatAddresses": {{snat_addresses:f5:ipv4_array}}
+            },
+          {{/make_snatpool}}
+        {{/snat_automap}}
+      {{/enable_snat}}
+  app_tls_server_def:
+    template: |
+      {{#enable_tls_server}}
+        {{#make_tls_server_profile}}
+          "{{app_name:f5:bigip_name}}_tls_server": {
+            "class": "TLS_Server",
+            "certificates": [{ "certificate": "{{app_name:f5:bigip_name}}_certificate" }]
+          },
+          "{{app_name:f5:bigip_name}}_certificate": {
+            "class": "Certificate",
+            "certificate": { "bigip": "{{tls_cert_name:f5:bigip_path}}" },
+            "privateKey": { "bigip": "{{tls_key_name:f5:bigip_path}}" }
+          },
+        {{/make_tls_server_profile}}
+      {{/enable_tls_server}}
+  app_tls_client_def:
+    template: |
+      {{#enable_tls_client}}
+        {{#make_tls_client_profile}}
+          "{{app_name:f5:bigip_name}}_tls_client": {
+            "class": "TLS_Client"
+          },
+        {{/make_tls_client_profile}}
+      {{/enable_tls_client}}
+  app_http_def:
+    template: |
+      {{#make_http_profile}}
+        "{{app_name:f5:bigip_name}}_http": {
+          "class": "HTTP_Profile",
+          "xForwardedFor": {{x_forwarded_for::boolean}}
+        },
+      {{/make_http_profile}}
+  service_pool_def:
+    template: |
+      {{#enable_pool}}
+        {{#make_pool}}
+          "pool": "{{app_name:f5:bigip_name}}_pool",
+        {{/make_pool}}
+        {{^make_pool}}
+          "pool": {
+            "bigip": "{{pool_name::string}}"
+          },
+        {{/make_pool}}
+      {{/enable_pool}}
+  service_snat_def:
+    template: |
+      {{#enable_snat}}
+        {{#snat_automap}}
+          "snat": "auto",
+        {{/snat_automap}}
+        {{^snat_automap}}
+          {{#make_snatpool}}
+            "snat": {
+              "use": "{{app_name:f5:bigip_name}}_snatpool"
+            },
+          {{/make_snatpool}}
+          {{^make_snatpool}}
+            "snat": {
+              "bigip": "{{snatpool_name::string}}"
+            },
+          {{/make_snatpool}}
+        {{/snat_automap}}
+      {{/enable_snat}}
+  service_persistence:
+    template: |
+      {{#enable_persistence}}
+        "persistenceMethods": ["{{persistence_type:f5:persistence}}"],
+        {{#enable_fallback_persistence}}
+          "fallbackPersistenceMethod": "{{fallback_persistence_type:f5:persistence}}",
+        {{/enable_fallback_persistence}}
+      {{/enable_persistence}}
+  service_tls_server_def:
+    template: |
+      {{#enable_tls_server}}
+        {{#make_tls_server_profile}}
+          "serverTLS": "{{app_name:f5:bigip_name}}_tls_server",
+        {{/make_tls_server_profile}}
+        {{^make_tls_server_profile}}
+          "serverTLS": {
+            "bigip": "{{tls_server_profile_name:f5:bigip_path}}"
+          },
+        {{/make_tls_server_profile}}
+      {{/enable_tls_server}}
+  service_tls_client_def:
+    template: |
+      {{#enable_tls_client}}
+        {{#make_tls_client_profile}}
+          "clientTLS": "{{app_name:f5:bigip_name}}_tls_client",
+        {{/make_tls_client_profile}}
+        {{^make_tls_client_profile}}
+          "clientTLS": {
+            "bigip": "{{tls_client_profile_name:f5:bigip_path}}"
+          },
+        {{/make_tls_client_profile}}
+      {{/enable_tls_client}}
+  service_http_def:
+    template: |
+      {{#make_http_profile}}
+        "profileHTTP": {
+          "use": "{{app_name:f5:bigip_name}}_http"
+        },
+      {{/make_http_profile}}
+      {{^make_http_profile}}
+        "profileHTTP": {
+          "bigip": "{{http_profile_name:f5:bigip_path}}"
+        },
+      {{/make_http_profile}}
+  service_acceleration_def:
+    template: |
+      {{#enable_acceleration}}
+        {{#make_acceleration_profile}}
+          "profileHTTPAcceleration": "basic",
+        {{/make_acceleration_profile}}
+        {{^make_acceleration_profile}}
+          "profileHTTPAcceleration": {
+            "bigip": "{{acceleration_profile_name:f5:bigip_path}}"
+          },
+        {{/make_acceleration_profile}}
+      {{/enable_acceleration}}
+  service_compression_def:
+    template: |
+      {{#enable_compression}}
+        {{#make_compression_profile}}
+          "profileHTTPCompression": "basic",
+        {{/make_compression_profile}}
+        {{^make_compression_profile}}
+          "profileHTTPCompression": {
+            "bigip": "{{compression_profile_name:f5:bigip_path}}"
+          },
+        {{/make_compression_profile}}
+      {{/enable_compression}}
+  service_multiplex_def:
+    template: |
+      {{#enable_multiplex}}
+        {{#make_multiplex_profile}}
+          "profileMultiplex": "basic",
+        {{/make_multiplex_profile}}
+        {{^make_multiplex_profile}}
+          "profileMultiplex": {
+            "bigip": "{{multiplex_profile_name:f5:bigip_path}}"
+          },
+        {{/make_multiplex_profile}}
+      {{/enable_multiplex}}
+  service_redirect80_def:
+    template: |
+      {{#enable_tls_server}}
+        "redirect80": {{enable_redirect::boolean}},
+      {{/enable_tls_server}}
+      {{^enable_tls_server}}
+        "redirect80": false,
+      {{/enable_tls_server}}
+  service_tcp_def:
+    template: |
+      {{#common_tcp_profile}}
+        {{#make_tcp_profile}}
+          "profileTCP": "{{tcp_topology:f5:topology}}"
+        {{/make_tcp_profile}}
+        {{^make_tcp_profile}}
+          "profileTCP": {
+            "bigip": "{{tcp_profile_name:f5:bigip_path}}"
+           }
+        {{/make_tcp_profile}}
+      {{/common_tcp_profile}}
+      {{^common_tcp_profile}}
+      "profileTCP": {
+          {{#make_tcp_ingress_profile}}
+            "ingress": "{{tcp_ingress_topology:f5:topology}}",
+          {{/make_tcp_ingress_profile}}
+          {{^make_tcp_ingress_profile}}
+            "ingress": {
+              "bigip": "{{tcp_ingress_profile_name:f5:bigip_path}}"
+            },
+          {{/make_tcp_ingress_profile}}
+          {{#make_tcp_egress_profile}}
+            "egress": "{{tcp_egress_topology:f5:topology}}"
+          {{/make_tcp_egress_profile}}
+          {{^make_tcp_egress_profile}}
+            "egress": {
+              "bigip": "{{tcp_egress_profile_name:f5:bigip_path}}"
+            }
+          {{/make_tcp_egress_profile}}
+       }
+      {{/common_tcp_profile}}
+parameters:
+  virtual_port: 443
+  enable_pool: true
+  make_pool: true
+  pool_port: 80
+  slow_ramp_time: 300
+  enable_monitor: true
+  make_monitor: true
+  monitor_name: /Common/tcp
+  enable_snat: true
+  snat_automap: true
+  make_snatpool: true
+  enable_persistence: true
+  persistence_type: source-address
+  enable_fallback_persistence: false
+  fallback_persistence_type: source-address
+  common_tcp_profile: false
+  make_tcp_profile: true
+  tcp_topology: lan
+  tcp_profile_name: /Common/f5-tcp-progressive
+  enable_tls_server: true
+  make_tls_server_profile: true
+  tls_server_profile_name: /Common/clientssl
+  enable_tls_client: false
+  make_tls_client_profile: true
+  tls_cert_name: /Common/default.crt
+  tls_key_name: /Common/default.key
+  tls_client_profile_name: /Common/serverssl
+  make_tcp_ingress_profile: true
+  tcp_ingress_topology: wan
+  tcp_ingress_profile_name: /Common/f5-tcp-progressive
+  make_tcp_egress_profile: true
+  tcp_egress_topology: lan
+  tcp_egress_profile_name: /Common/f5-tcp-progressive
+  make_http_profile: true
+  x_forwarded_for: true
+  http_profile_name: /Common/http
+  enable_acceleration: true
+  make_acceleration_profile: true
+  acceleration_profile_name: /Common/webacceleration
+  enable_compression: true
+  make_compression_profile: true
+  compression_profile_name: /Common/httpcompression
+  enable_multiplex: true
+  make_multiplex_profile: true
+  multiplex_profile_name: /Common/oneconnect
+  enable_redirect: true
+template: |
+  {
+   "class":"ADC",
+   "schemaVersion":"3.11.0",
+   "id":"urn:uuid:2c8b29bb-f318-4631-961a-94baea550b36",
+   "label":"Exchange single VIP application",
+   "remark":"This is Exchange 2016 Application objects for tenant",
+   "myapps":{
+      "class":"Tenant",
+      "mail.aserracorp.com":{
+         "class":"Application",
+         "template":"https",
+         "ExchangeVS_ad_pool3":{
+            "loadBalancingMode":"least-connections-member",
+            "members":[
+               {
+                  "addressDiscovery":"static",
+                  "servicePort":443,
+                  "serverAddresses":[
+                     "172.16.60.107"
+                  ]
+               }
+            ],
+            "monitors":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_ad_http_monitor"
+               }
+            ],
+            "class":"Pool"
+         },
+         "ExchangeVS_as_pool3":{
+            "loadBalancingMode":"least-connections-member",
+            "members":[
+               {
+                  "addressDiscovery":"static",
+                  "servicePort":443,
+                  "serverAddresses":[
+                     "172.16.60.107"
+                  ]
+               }
+            ],
+            "monitors":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_as_http_monitor"
+               }
+            ],
+            "class":"Pool"
+         },
+         "ExchangeVS_ews_pool3":{
+            "loadBalancingMode":"least-connections-member",
+            "members":[
+               {
+                  "addressDiscovery":"static",
+                  "servicePort":443,
+                  "serverAddresses":[
+                     "172.16.60.107"
+                  ]
+               }
+            ],
+            "monitors":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_ews_http_monitor"
+               }
+            ],
+            "class":"Pool"
+         },
+         "ExchangeVS_mapi_pool3":{
+            "loadBalancingMode":"least-connections-member",
+            "members":[
+               {
+                  "addressDiscovery":"static",
+                  "servicePort":443,
+                  "serverAddresses":[
+                     "172.16.60.107"
+                  ]
+               }
+            ],
+            "monitors":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_mapi_http_monitor"
+               }
+            ],
+            "class":"Pool"
+         },
+         "ExchangeVS_owa_pool3":{
+            "loadBalancingMode":"least-connections-member",
+            "members":[
+               {
+                  "addressDiscovery":"static",
+                  "servicePort":443,
+                  "serverAddresses":[
+                     "172.16.60.107"
+                  ]
+               }
+            ],
+            "monitors":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_owa_http_monitor"
+               }
+            ],
+            "class":"Pool"
+         },
+         "ExchangeVS_combined_pool_irule3":{
+            "class":"iRule",
+            "iRule":"when HTTP_REQUEST {\n    switch -glob -- [string tolower [HTTP::path]] {\n        \"/microsoft-server-activesync*\" {\n            TCP::idletime 1800\n            pool /myapps/mail.aserracorp.com/ExchangeVS_as_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/owa*\" {\n            \n            pool /myapps/mail.aserracorp.com/ExchangeVS_owa_pool3\n            return\n        }\n        \"/ecp*\" {\n            \n            pool /myapps/mail.aserracorp.com/ExchangeVS_owa_pool3\n            return\n        }\n        \"/ews*\" {\n            pool /myapps/mail.aserracorp.com/ExchangeVS_ews_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/oab*\" {\n            pool /myapps/mail.aserracorp.com/ExchangeVS_ews_pool3\n            persist none\n            return\n        }\n        \"/mapi*\" {\n            pool /myapps/mail.aserracorp.com/ExchangeVS_mapi_pool3\n            COMPRESS::disable\n            CACHE::disable\n            return\n         }\n        \"/rpc/rpcproxy.dll*\" {\n            \n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/autodiscover*\" {\n            pool /myapps/mail.aserracorp.com/ExchangeVS_ad_pool3\n            persist none\n            return\n        }\n        default {\n            pool /myapps/mail.aserracorp.com/ExchangeVS_owa_pool3\n        }\n    }\n}\nwhen HTTP_RESPONSE {\n    if { ( [HTTP::header exists \"WWW-Authenticate\"] &&\n        [string tolower [HTTP::header values \"WWW-Authenticate\"]] contains \"negotiate\" ) ||\n        ( [HTTP::header exists \"Persistent-Auth\"] &&\n        [string tolower [HTTP::header \"Persistent-Auth\"]] contains \"true\" ) } {\n        NTLM::disable\n   }\n   if {[HTTP::header exists \"Transfer-Encoding\"]} {\n        HTTP::payload rechunk\n   }\n}"
+         },
+         "ExchangeVS_owa_redirect_irule3":{
+            "class":"iRule",
+            "iRule":"priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
+         },
+         "servertls":{
+            "class":"TLS_Client",
+            "trustCA":"none"
+         },
+         "webtls":{
+            "class":"TLS_Server",
+            "certificates":[
+               {
+                  "certificate":"webcert"
+               }
+            ]
+         },
+         "webcert":{
+            "class":"Certificate",
+            "remark":"in practice we recommend using a passphrase",
+            "certificate":"-----BEGIN CERTIFICATE-----\nMIIFWTCCBEGgAwIBAgITfQAAAEODziK48fSSRAAAAAAAQzANBgkqhkiG9w0BAQUF\nADBOMRMwEQYKCZImiZPyLGQBGRYDY29tMRowGAYKCZImiZPyLGQBGRYKYXNlcnJh\nY29ycDEbMBkGA1UEAxMSYXNlcnJhY29ycC1EQy1DQS0xMB4XDTIwMDgxNDE4NTUx\nNFoXDTIyMDgxNDE4NTUxNFowHjEcMBoGA1UEAxMTbWFpbC5hc2VycmFjb3JwLmNv\nbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOIxEn3SCBJDtf326uc1\nYofza/s3U7ilYr72hDBiYOA2tpFegzzR0miE7WpJlenMEh5DsjRXI5P02/G5O00W\nNHon8mAR0KmbzgatgiA37xgXnI55aH3mgtJS5FwaeO94Gagv7LBrInC4Ym80pM8d\nEPohDxF5mTO02m2+hoVn5gXkbnuA2KeqPOK1vw1x29JUfsHCONFYBoWsTqGBscrM\ncjIjvAoOsl7EEDbPOeoydIiu55XhOaiIp1Vm/jYo0hFfEYTOx2Qz2dA0j0rgbdKh\ndwtcBonZHNsv3DYG0PnTWT4SK4glgd4vElW7+Hp+gp755QMjrTkV1OM3lV0v0cEQ\nCi0CAwEAAaOCAl4wggJaMDsGCSsGAQQBgjcVBwQuMCwGJCsGAQQBgjcVCIGD0GmD\nm+cHhvmXGKCGN4PxgTR5gv66PIKFaQIBZAIBAzATBgNVHSUEDDAKBggrBgEFBQcD\nATAOBgNVHQ8BAf8EBAMCBaAwGwYJKwYBBAGCNxUKBA4wDDAKBggrBgEFBQcDATAd\nBgNVHQ4EFgQU0JRapN6/FyumdxT5iomav7LL/4wwHwYDVR0jBBgwFoAUETMyELiX\nqbKOY7RYFjazS0uPV9Awgc4GA1UdHwSBxjCBwzCBwKCBvaCBuoaBt2xkYXA6Ly8v\nQ049YXNlcnJhY29ycC1EQy1DQS0xLENOPWRjLENOPUNEUCxDTj1QdWJsaWMlMjBL\nZXklMjBTZXJ2aWNlcyxDTj1TZXJ2aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPWFz\nZXJyYWNvcnAsREM9Y29tP2NlcnRpZmljYXRlUmV2b2NhdGlvbkxpc3Q/YmFzZT9v\nYmplY3RDbGFzcz1jUkxEaXN0cmlidXRpb25Qb2ludDCBxwYIKwYBBQUHAQEEgbow\ngbcwgbQGCCsGAQUFBzAChoGnbGRhcDovLy9DTj1hc2VycmFjb3JwLURDLUNBLTEs\nQ049QUlBLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENO\nPUNvbmZpZ3VyYXRpb24sREM9YXNlcnJhY29ycCxEQz1jb20/Y0FDZXJ0aWZpY2F0\nZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmljYXRpb25BdXRob3JpdHkwDQYJKoZI\nhvcNAQEFBQADggEBAHF/co/AP1OXkGuwxMIxapLLnS0VI2y20X+3zosfbnjh4OJ9\nh7KM6+v2g4bdgEGwu1vFeZioCIKxqSgGPwwNNO5i5iPHJp3hf/eZHe/iKUqviG4L\nvdx8+Djy/vaWnyqDUitHxUMmMCJUtwczuTOVbKyKYWp14xjI9xwOVjiCId+h4KJR\n8kUJKcdRqGTOps4qfdGLJt3nSHlXRAMBeHN146LePydRF77NoFnCbrjkRB44Sdcx\nbkv2IHI4ksajY34UdHTlTPM5AKfwL1+fiwQGy+kT0mY9uEHnOX4pE/AXUNAVFyfx\nB1fGVHNPbzcu2JpRY4/3gp1HCoc7dxfMDyLqLRI=\n-----END CERTIFICATE-----",
+            "privateKey":"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDiMRJ90ggSQ7X9\n9urnNWKH82v7N1O4pWK+9oQwYmDgNraRXoM80dJohO1qSZXpzBIeQ7I0VyOT9Nvx\nuTtNFjR6J/JgEdCpm84GrYIgN+8YF5yOeWh95oLSUuRcGnjveBmoL+ywayJwuGJv\nNKTPHRD6IQ8ReZkztNptvoaFZ+YF5G57gNinqjzitb8NcdvSVH7BwjjRWAaFrE6h\ngbHKzHIyI7wKDrJexBA2zznqMnSIrueV4TmoiKdVZv42KNIRXxGEzsdkM9nQNI9K\n4G3SoXcLXAaJ2RzbL9w2BtD501k+EiuIJYHeLxJVu/h6foKe+eUDI605FdTjN5Vd\nL9HBEAotAgMBAAECggEAISI0xhHoanCDw3jnmR3fWfCPs/mQqImFiQQIgiPvHU5h\nI7NMwIcwmMHxcJ095MUm2aBrWt0cPOtkn/3/0KoniXC6QatqaGYGjJY0a8QgdeQu\nOUqnQrDBH3koCCaSlOsAFdHgt0kXqZvA7kRaaMJ7vwBCZPoYiz6mCTxxwoS2k8xy\nHPTAYGvELE05kbXHKa/ji9quJstkdBQHbVsQA8kpOyKbf/Ob1k7mM4T35t1pPiWV\nakBKYqFuhnMDhIO0msPkNBrMYKoZ+9X1UxxDiqTvMTzqaCXlYdp0Ou5gQYZ/WSgW\nTps9/LGv83XOTdC/AbjQGF1zmjRjOcOdno1Vn/isCwKBgQD89QLUTvc8jHBFM2aW\nvdk714Lb//X2dyswDh0vZsXHzdZMZGImshUyhZ86PY61YhYMdVx9a2wUVqsJdiQf\nmwcUgWvoRr455Ltsh9s2qjFbyUOFJMABCdoFRU5zlJl/ofhRDKI2T1coxi1ztryA\nYXCf+6vyCxDHmIBvhbdvvQAt9wKBgQDk6aLo4VC1Cek24HmC5cvl8Pc+YQztvzZ/\nlOLdvEOml8XG7/n7IxVm19FfEXp6VSgOZ/XuASBdk7HtDl3ZE2KyFfNGIc5+p8hW\nykjYhaVVBqLXZo6AWf69ud1uKGJ8/nKanuJgHWjcjFUHMv15hOd7Vaf9Lcw7iA1K\nqcmu8/qP+wKBgCcjUZi/zwkTQZuzZEAWh7H2mkynwcqsjYYV6PYYlKlhc7LGJVmP\nXDBA9G3ycE4oKvkqf3D4WfSbpEMGgHhTaDkH/UYnC++xMD6OlqBSnOhyr3u+P+bp\nO05tdsHzT/yrdtwzdDWq+PVaFFY/A9NpQB/AtM3yYFpBgj2/Fq63M3vpAoGALu1C\na1E9VU+p0okj/9SR/xpt5QjKOLbZOkBQXbppd+5nKggqC/S+P24AyudvX0Kzyng/\nb0Il22kasYkfbg/OTMm5LGhjx40nwbsIQfLr2MlaeqPYlLFeSpCetyVqQ0t6PP5T\nU/bTd1sBV095rP604ZDGtl08H/wdFXBHGymC9R8CgYEAsHlPfmNv3YUMHH/K9Uj1\nsYl96rkYcxKD6prrAVVoJFknKwGwS/4ydtkp90krV/RkR92kPO7c0tL9Q/QcJ7Bu\nOQowe2bl/Ggop8BT8Bjps2E4tExPJjQrU1qX3q1h8DLWBaYAPNK+WSBjO0vFExPu\nphQN+5tz3Is1gkkX2eU8ueM=\n-----END PRIVATE KEY-----\n"
+         },
+         "serviceMain":{
+            "layer4":"tcp",
+            "translateServerAddress":true,
+            "serverTLS":"webtls",
+            "clientTLS":"servertls",
+            "translateServerPort":true,
+            "class":"Service_HTTPS",
+            "iRules":[
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_owa_redirect_irule3"
+               },
+               {
+                  "use":"/myapps/mail.aserracorp.com/ExchangeVS_combined_pool_irule3"
+               }
+            ],
+            "profileHTTPAcceleration":{
+               "use":"ExchangeVS-cache-optimize"
+            },
+            "profileHTTP":{
+               "use":"ExchangeVS-http"
+            },
+            "profileHTTPCompression":{
+               "use":"ExchangeVS-httpcompression"
+            },
+            "profileTCP":{
+               "egress":{
+                  "use":"ExchangeVS-tcp-lan"
+               },
+               "ingress":{
+                  "use":"ExchangeVS-tcp-wan"
+               }
+            },
+            "virtualAddresses":[
+               "206.124.129.197"
+            ],
+            "virtualPort":443,
+            "persistenceMethods":[
+               
+            ],
+            "snat":"auto"
+         },
+         "ExchangeVS_ad_http_monitor":{
+            "adaptive":false,
+            "interval":10,
+            "dscp":0,
+            "receive":"200 OK",
+            "send":"GET /autodiscover/healthcheck.htm HTTP/1.1\\r\\nHost: mail.aserracorp.com\\r\\nConnection: Close\\r\\n\\r\\n",
+            "timeUntilUp":0,
+            "timeout":31,
+            "class":"Monitor",
+            "monitorType":"https",
+            "targetAddress":"",
+            "targetPort":0
+         },
+         "ExchangeVS_as_http_monitor":{
+            "adaptive":false,
+            "interval":10,
+            "dscp":0,
+            "receive":"200 OK",
+            "send":"GET /Microsoft-Server-Activesync/healthcheck.htm HTTP/1.1\\r\\nHost: mail.aserracorp.com\\r\\nConnection: Close\\r\\n\\r\\n",
+            "timeUntilUp":0,
+            "timeout":31,
+            "class":"Monitor",
+            "monitorType":"https",
+            "targetAddress":"",
+            "targetPort":0
+         },
+         "ExchangeVS_ews_http_monitor":{
+            "adaptive":false,
+            "interval":10,
+            "dscp":0,
+            "receive":"200 OK",
+            "send":"GET /EWS/healthcheck.htm HTTP/1.1\\r\\nHost: mail.aserracorp.com\\r\\nConnection: Close\\r\\n\\r\\n",
+            "timeUntilUp":0,
+            "timeout":31,
+            "class":"Monitor",
+            "monitorType":"https",
+            "targetAddress":"",
+            "targetPort":0
+         },
+         "ExchangeVS_mapi_http_monitor":{
+            "adaptive":false,
+            "interval":10,
+            "dscp":0,
+            "receive":"200 OK",
+            "send":"GET /mapi/healthcheck.htm HTTP/1.1\\r\\nHost: mail.aserracorp.com\\r\\nConnection: Close\\r\\n\\r\\n",
+            "timeUntilUp":0,
+            "timeout":31,
+            "class":"Monitor",
+            "monitorType":"https",
+            "targetAddress":"",
+            "targetPort":0
+         },
+         "ExchangeVS_owa_http_monitor":{
+            "adaptive":false,
+            "interval":10,
+            "dscp":0,
+            "receive":"200 OK",
+            "send":"GET /owa/healthcheck.htm HTTP/1.1\\r\\nHost: mail.aserracorp.com\\r\\nConnection: Close\\r\\n\\r\\n",
+            "timeUntilUp":0,
+            "timeout":31,
+            "class":"Monitor",
+            "monitorType":"https",
+            "targetAddress":"",
+            "targetPort":0
+         },
+         "ExchangeVS-http":{
+            "proxyType":"reverse",
+            "class":"HTTP_Profile",
+            "rewriteRedirects":"all"
+         },
+         "ExchangeVS-httpcompression":{
+            "contentTypeIncludes":[
+               "application/(xml|x-javascript)"
+            ],
+            "class":"HTTP_Compress"
+         },
+         "ExchangeVS-oneconnect":{
+            "class":"Multiplex_Profile",
+            "maxConnections":5000,
+            "maxConnectionAge":3600,
+            "maxConnectionReuse":20000,
+            "idleTimeoutOverride":900,
+            "connectionLimitEnforcement":"idle",
+            "sharePools":true
+         },
+         "ExchangeVS-tcp-lan":{
+            "idleTimeout":2100,
+            "class":"TCP_Profile"
+         },
+         "ExchangeVS-tcp-wan":{
+            "idleTimeout":2100,
+            "class":"TCP_Profile"
+         },
+         "ExchangeVS-cache-optimize":{
+            "uriExcludeList":[
+               "/owa/ev.owa",
+               "oab.xml"
+            ],
+            "uriIncludeList":[
+               ".*"
+            ],
+            "parentProfile":{
+               "bigip":"/Common/optimized-caching"
+            },
+            "class":"HTTP_Acceleration_Profile"
+         }
+      }
+   }
+  }
