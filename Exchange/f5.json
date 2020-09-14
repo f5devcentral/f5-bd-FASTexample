@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/hyper-schema",
+    "definitions": {
+      "bigip_path": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^\\x2f[^\\x00-\\x19\\x22#'*<>?\\x5b-\\x5d\\x7b-\\x7d\\x7f]+$",
+        "maxLength": 255
+      },
+      "bigip_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "^[A-Za-z][0-9A-Za-z_.-]*$"
+      },
+      "subnet": {
+        "type": "string",
+        "enum": [
+          "Same subnet for BIG-IP virtual servers and Mailbox Servers",          
+          "Different subnet for BIG-IP virtual servers and Mailbox Servers"
+        ],
+        "default": "Same subnet for BIG-IP virtual servers and Mailbox Servers"
+      },
+      "snat": {
+        "type": "string",
+        "enum": [
+          "Mailbox servers do NOT use BIG-IP as their default gateway",          
+          "Mailbox servers use the BIG-IP as their default gateway"
+        ],
+        "default": "Mailbox servers do NOT use BIG-IP as their default gateway"
+      },
+      "ipv4": {
+        "type": "string",
+        "format": "ipv4",
+        "default": "10.0.0.1"
+      },
+      "ipv4_array": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/ipv4"
+        },
+        "default": []
+      },
+      "non_empty_string": {
+        "type": "string",
+        "minLength": 1
+      },
+      "port": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 65535
+      }
+    }
+  }
+  

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/hyper-schema",
+  "definitions": {
+    "bigip_path": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^\\x2f[^\\x00-\\x19\\x22#'*<>?\\x5b-\\x5d\\x7b-\\x7d\\x7f]+$",
+        "maxLength": 255
+    },
+    "bigip_name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "pattern": "^[A-Za-z][0-9A-Za-z_.-]*$"
+    },
+    "ipv4": {
+      "type": "string",
+      "format": "ipv4",
+      "default": "10.0.0.1"
+    },
+    "ipv4_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ipv4"
+      },
+      "default": []
+    },
+    "load_balancing_mode": {
+      "type": "string",
+      "enum": [
+        "dynamic-ratio-member",
+        "dynamic-ratio-node",
+        "fastest-app-response",
+        "fastest-node",
+        "least-connections-member",
+        "least-connections-node",
+        "least-sessions",
+        "observed-member",
+        "observed-node",
+        "predictive-member",
+        "predictive-node",
+        "ratio-least-connections-member",
+        "ratio-least-connections-node",
+        "ratio-member",
+        "ratio-node",
+        "ratio-session",
+        "round-robin",
+        "weighted-least-connections-member",
+        "weighted-least-connections-node"
+      ],
+      "default": "least-connections-member"
+    },
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "persistence": {
+      "type": "string",
+      "enum": [
+        "cookie",
+        "destination-address",
+        "msrdp",
+        "source-address",
+        "tls-session-id"
+      ]
+    },
+    "topology": {
+      "type": "string",
+      "enum": [
+        "lan",
+        "wan",
+        "mobile"
+      ]
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    }
+  }
+}
