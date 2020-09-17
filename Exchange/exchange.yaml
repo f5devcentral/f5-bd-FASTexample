@@ -42,6 +42,7 @@ definitions:
   make_snatpool:
     title: Automatically manage the SNAT pool.
     type: boolean
+    description: If selected the BIG-IP will create and manage a snatpool.  Otherwise, select an existing snatpool.  NOTE The pool must exist in the Common partition.
   snatpool_name:
     title: Specify the name of an existing BIG-IP SNAT pool.
     enumFromBigip: 'ltm/snatpool'
@@ -502,7 +503,7 @@ definitions:
           {{#make_snatpool}}
             "{{app_name:f5:bigip_name}}_snatpool": {
               "class": "SNAT_Pool",
-              "snatAddresses": {{snat_addresses}}
+              "snatAddresses": {{snat_addresses:f5:ipv4_array}}
             },
           {{/make_snatpool}}
         {{/snat_automap}}
@@ -588,10 +589,13 @@ definitions:
           {{/make_snatpool}}
           {{^make_snatpool}}
             "snat": {
-              "bigip": "{{snatpool_name::string}}"
+              "bigip": { "bigip": "{{snatpool_name:f5:bigip_path}}" }
             },
           {{/make_snatpool}}
         {{/snat_automap}}
+      {{/enable_snat}}
+      {{^enable_snat}}
+        "snat": "none",
       {{/enable_snat}}
   service_accelerate_def:
     template: |
@@ -632,8 +636,7 @@ parameters:
   app_fqdn: ''
   enable_snat: true
   snat_automap: true
-  make_snatpool: false
-  snatpool_name: ''
+  make_snatpool: true
   tcp_topology: lan
   enable_tls_server: true
   enable_tls_client: false
@@ -641,6 +644,7 @@ parameters:
   tls_cert_name: /Common/default.crt
   tls_key_name: /Common/default.key
   tls_client_profile_name: /Common/serverssl
+  snatpool_name:  /Common
   tcp_ingress_topology: wan
   tcp_egress_topology: lan
   virtual_port: 443
