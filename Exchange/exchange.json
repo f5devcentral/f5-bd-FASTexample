@@ -1,106 +1,250 @@
 {
-   "class": "ADC",
-   "schemaVersion": "3.0.0",
-   "id": "urn:uuid:a858e55e-bbe6-42ce-a9b9-0f4ab33e3bf7",
-   "myapps": {
-     "class": "Tenant",
-     "Exchange2016": {
-       "class": "Application",
-       "template": "https",
-       "Exchange2016_pool": {
-         "class": "Pool",
-         "members": [
-           {
-             "serverAddresses": [
-               "172.16.60.107"
-             ],
-             "servicePort": 443,
-             "shareNodes": true
-           }
-         ],
-         "loadBalancingMode": "least-connections-member",
-         "monitors": [
-           {
-             "use": "Exchange2016_monitor"
-           }
-         ]
-       },
-       "Exchange2016_monitor": {
-         "adaptive": false,
-         "interval": 5,
-         "dscp": 0,
-         "send": "GET / HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
-         "receive": "X-exchangeHealthScore: [0-5].",
-         "timeUntilUp": 0,
-         "timeout": 16,
-         "class": "Monitor",
-         "monitorType": "https",
-         "targetAddress": "",
-         "targetPort": 0
-       },
-       "Exchange2016_tls_server": {
-         "class": "TLS_Server",
-         "certificates": [
-           {
-             "certificate": "Exchange2016_certificate"
-           }
-         ]
-       },
-       "Exchange2016_certificate": {
-         "class": "Certificate",
-         "certificate": {
-           "bigip": "/Common/mail.aserracorp.com"
-         },
-         "privateKey": {
-           "bigip": "/Common/mail.aserracorp.com"
-         }
-       },
-       "Exchange2016_tls_client": {
-         "class": "TLS_Client"
-       },
-       "Exchange2016_http": {
-         "class": "HTTP_Profile",
-         "xForwardedFor": true
-       },
-       "Exchange2016_cache-optimize": {
-         "parentProfile": {
-           "bigip": "/Common/optimized-caching"
-         },
-         "class": "HTTP_Acceleration_Profile",
-         "uriIncludeList": [
-           ".*"
-         ],
-         "uriExcludeList": [
-           "/owa/ev.owa",
-           "oab.xml"
-         ]
-       },
-       "Exchange2016_wan-optimized-compression": {
-         "class": "HTTP_Compress"
-       },
-       "serviceMain": {
-         "virtualAddresses": [
-           "206.124.129.197"
-         ],
-         "virtualPort": 443,
-         "class": "Service_HTTPS",
-         "pool": "Exchange2016_pool",
-         "serverTLS": "Exchange2016_tls_server",
-         "clientTLS": "Exchange2016_tls_client",
-         "profileHTTP": {
-           "use": "Exchange2016_http"
-         },
-         "snat": "auto",
-         "profileHTTPAcceleration": {
-           "use": "Exchange2016_cache-optimize"
-         },
-         "profileHTTPCompression": {
-           "use": "Exchange2016_wan-optimized-compression"
-         },
-         "redirect80": true,
-         "ingress": "wan",
-         "egress": "lan"
-       }
-     }
-   }
- }
+  "class": "ADC",
+  "schemaVersion": "3.0.0",
+  "id": "urn:uuid:a858e55e-bbe6-42ce-a9b9-0f4ab33e3bf7",
+  "myapps": {
+    "class": "Tenant",
+    "Exchange2016": {
+      "class": "Application",
+      "template": "https",
+      "exchangeVS_ad_pool": {
+        "class": "Pool",
+        "members": [
+          {
+            "serverAddresses": [
+              "172.16.60.107"
+            ],
+            "servicePort": 443,
+            "shareNodes": true
+          }
+        ],
+        "loadBalancingMode": "least-connections-member",
+        "monitors": [
+          {
+            "use": "exchangeVS_ad_https_monitor"
+          }
+        ]
+      },
+      "exchangeVS_as_pool": {
+        "class": "Pool",
+        "members": [
+          {
+            "serverAddresses": [
+              "172.16.60.107"
+            ],
+            "servicePort": 443,
+            "shareNodes": true
+          }
+        ],
+        "loadBalancingMode": "least-connections-member",
+        "monitors": [
+          {
+            "use": "exchangeVS_as_https_monitor"
+          }
+        ]
+      },
+      "exchangeVS_ews_pool": {
+        "class": "Pool",
+        "members": [
+          {
+            "serverAddresses": [
+              "172.16.60.107"
+            ],
+            "servicePort": 443,
+            "shareNodes": true
+          }
+        ],
+        "loadBalancingMode": "least-connections-member",
+        "monitors": [
+          {
+            "use": "exchangeVS_ews_https_monitor"
+          }
+        ]
+      },
+      "exchangeVS_mapi_pool": {
+        "class": "Pool",
+        "members": [
+          {
+            "serverAddresses": [
+              "172.16.60.107"
+            ],
+            "servicePort": 443,
+            "shareNodes": true
+          }
+        ],
+        "loadBalancingMode": "least-connections-member",
+        "monitors": [
+          {
+            "use": "exchangeVS_mapi_https_monitor"
+          }
+        ]
+      },
+      "exchangeVS_owa_pool": {
+        "class": "Pool",
+        "members": [
+          {
+            "serverAddresses": [
+              "172.16.60.107"
+            ],
+            "servicePort": 443,
+            "shareNodes": true
+          }
+        ],
+        "loadBalancingMode": "least-connections-member",
+        "monitors": [
+          {
+            "use": "exchangeVS_owa_https_monitor"
+          }
+        ]
+      },
+      "exchangeVS_ad_https_monitor": {
+        "adaptive": false,
+        "interval": 10,
+        "dscp": 0,
+        "send": "GET /autodiscover/healthcheck.htm HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
+        "receive": "200 OK",
+        "timeUntilUp": 0,
+        "timeout": 31,
+        "class": "Monitor",
+        "monitorType": "https",
+        "targetAddress": "",
+        "targetPort": 0
+      },
+      "exchangeVS_as_https_monitor": {
+        "adaptive": false,
+        "interval": 10,
+        "dscp": 0,
+        "send": "GET /Microsoft-Server-Activesync/healthcheck.htm HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
+        "receive": "200 OK",
+        "timeUntilUp": 0,
+        "timeout": 31,
+        "class": "Monitor",
+        "monitorType": "https",
+        "targetAddress": "",
+        "targetPort": 0
+      },
+      "exchangeVS_ews_https_monitor": {
+        "adaptive": false,
+        "interval": 10,
+        "dscp": 0,
+        "send": "GET /EWS/healthcheck.htm HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
+        "receive": "200 OK",
+        "timeUntilUp": 0,
+        "timeout": 31,
+        "class": "Monitor",
+        "monitorType": "https",
+        "targetAddress": "",
+        "targetPort": 0
+      },
+      "exchangeVS_owa_https_monitor": {
+        "adaptive": false,
+        "interval": 10,
+        "dscp": 0,
+        "send": "GET /owa/healthcheck.htm HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
+        "receive": "200 OK",
+        "timeUntilUp": 0,
+        "timeout": 31,
+        "class": "Monitor",
+        "monitorType": "https",
+        "targetAddress": "",
+        "targetPort": 0
+      },
+      "exchangeVS_mapi_https_monitor": {
+        "adaptive": false,
+        "interval": 10,
+        "dscp": 0,
+        "send": "GET /mapi/healthcheck.htm HTTP/1.1\r\nHost: mail.aserracorp.com\r\nConnection: Close\r\n\r\n",
+        "receive": "200 OK",
+        "timeUntilUp": 0,
+        "timeout": 31,
+        "class": "Monitor",
+        "monitorType": "https",
+        "targetAddress": "",
+        "targetPort": 0
+      },
+      "Exchange2016_tls_server": {
+        "class": "TLS_Server",
+        "certificates": [
+          {
+            "certificate": "Exchange2016_certificate"
+          }
+        ]
+      },
+      "Exchange2016_certificate": {
+        "class": "Certificate",
+        "certificate": {
+          "bigip": "/Common/mail.aserracorp.com"
+        },
+        "privateKey": {
+          "bigip": "/Common/mail.aserracorp.com"
+        }
+      },
+      "Exchange2016_tls_client": {
+        "class": "TLS_Client"
+      },
+      "Exchange2016_http": {
+        "class": "HTTP_Profile",
+        "xForwardedFor": true
+      },
+      "Exchange2016_cache-optimize": {
+        "parentProfile": {
+          "bigip": "/Common/optimized-caching"
+        },
+        "class": "HTTP_Acceleration_Profile",
+        "uriIncludeList": [
+          ".*"
+        ],
+        "uriExcludeList": [
+          "/owa/ev.owa",
+          "oab.xml"
+        ]
+      },
+      "Exchange2016_wan-optimized-compression": {
+        "class": "HTTP_Compress",
+        "contentTypeIncludes": [
+          "text/(css | html | javascript | json | plain | postscript | richtext | rtf | vnd.wap.wml | vnd.wap.wmlscript | wap | wml | x-component | x-vcalendar | x-vcard | xml) ",
+          "application/(css | css-stylesheet | doc | excel | javascript | json | lotus123 | mdb | mpp | ms-excel | ms-powerpoint | ms-word | msaccess | msexcel | mspowerpoint | msproject | msword | photoshop | postscript | powerpoint | ps | psd | quarkexpress | rtf | txt | visio | vnd.excel | vnd.ms-access | vnd.ms-excel | vnd.ms-powerpoint | vnd.ms-pps | vnd.ms-project | vnd.msword | vnd.ms-works | vnd.ms-works-db | vnd.msaccess | vnd.msexcel | vnd.mspowerpoint | vnd.msword | vnd.powerpoint | vnd.visio | vnd.wap.cmlscriptc | vnd.wap.wmlc | vnd.wap.xhtml+xml | vnd.word | vsd | winword | wks | word | x-excel | x-java-jnlp-file | x-javascript | x-json | x-lotus123 | x-mdb | x-ms-excel | x-ms-project | x-mscardfile | x-msclip | x-msexcel | x-mspowerpoint | x-msproject | x-msword | x-msworks-db | x-msworks-wps | x-photoshop | x-postscript | x-powerpoint | x-ps | x-quark-express | x-rtf | x-vermeer-rpc | x-visio | x-vsd | x-wks | x-word | x-xls | x-xml | xhtml+xml | xls | xml) ",
+          "image/(photoshop | psd | x-photoshop | x-vsd)"
+        ]
+      },
+      "Exchange2016_combined_pool_irule3": {
+        "class": "iRule",
+        "iRule": "when HTTP_REQUEST {\n    switch -glob -- [string tolower [HTTP::path]] {\n        \"/microsoft-server-activesync*\" {\n            TCP::idletime 1800\n            pool exchangeVS_as_pool\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/owa*\" {\n            \n            pool exchangeVS_owa_pool\n            return\n        }\n        \"/ecp*\" {\n            \n            pool exchangeVS_owa_pool\n            return\n        }\n        \"/ews*\" {\n            pool exchangeVS_ews_pool\n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/oab*\" {\n            pool exchangeVS_ews_pool\n            persist none\n            return\n        }\n        \"/mapi*\" {\n            pool exchangeVS_mapi_pool\n            COMPRESS::disable\n            CACHE::disable\n            return\n         }\n        \"/rpc/rpcproxy.dll*\" {\n            \n            COMPRESS::disable\n            CACHE::disable\n            return\n        }\n        \"/autodiscover*\" {\n            pool exchangeVS_ad_pool\n            persist none\n            return\n        }\n        default {\n            pool exchangeVS_owa_pool\n        }\n    }\n}\nwhen HTTP_RESPONSE {\n    if { ( [HTTP::header exists \"WWW-Authenticate\"] &&\n        [string tolower [HTTP::header values \"WWW-Authenticate\"]] contains \"negotiate\" ) ||\n        ( [HTTP::header exists \"Persistent-Auth\"] &&\n        [string tolower [HTTP::header \"Persistent-Auth\"]] contains \"true\" ) } {\n        NTLM::disable\n   }\n   if {[HTTP::header exists \"Transfer-Encoding\"]} {\n        HTTP::payload rechunk\n   }\n}"
+      },
+      "Exchange2016_owa_redirect_irule3": {
+        "class": "iRule",
+        "iRule": "priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
+      },
+      "serviceMain": {
+        "virtualAddresses": [
+          "206.124.129.197"
+        ],
+        "virtualPort": 443,
+        "class": "Service_HTTPS",
+        "serverTLS": "Exchange2016_tls_server",
+        "clientTLS": "Exchange2016_tls_client",
+        "profileHTTP": {
+          "use": "Exchange2016_http"
+        },
+        "snat": "auto",
+        "profileHTTPAcceleration": {
+          "use": "Exchange2016_cache-optimize"
+        },
+        "profileHTTPCompression": {
+          "use": "Exchange2016_wan-optimized-compression"
+        },
+        "redirect80": true,
+        "iRules": [
+          {
+            "use": "Exchange2016_owa_redirect_irule3"
+          },
+          {
+            "use": "Exchange2016_combined_pool_irule3"
+          }
+        ],
+        "ingress": "wan",
+        "egress": "lan"
+      }
+    }
+  }
+}
