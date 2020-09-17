@@ -644,7 +644,7 @@ parameters:
   tls_cert_name: /Common/default.crt
   tls_key_name: /Common/default.key
   tls_client_profile_name: /Common/serverssl
-  snatpool_name:  /Common
+  snatpool_name: /Common
   tcp_ingress_topology: wan
   tcp_egress_topology: lan
   virtual_port: 443

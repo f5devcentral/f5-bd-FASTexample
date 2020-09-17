@@ -2,6 +2,9 @@ definitions:
   tenant_name:
     title: What is the tenant name?
     description: The tenant is the high-level grouping in an AS3 declaration. FAST deploys all configuration for a given tenant in a BIG-IP partition of the same name.
+  app_name:
+    title: What is the application name?
+    description: The application is the low-level grouping in an AS3 declaration. FAST deploys all configuration for a given application in a BIG-IP folder within the tenant partition.
   app_fqdn:
     title: What is the Sharepoint application's FQDN?
     description: Clients can use the FQDN (Fully Qualified Domain Name) you enter here to access the SharePoint servers. Your DNS administrator must configure a DNS entry that resolves to the IP address you entered for the BIG-IP virtual server.
@@ -18,6 +21,23 @@ definitions:
     description: Which SharePoint servers should be included in this pool?
   pool_port:
     title: What TCP port do you want to use for the pool members?
+  enable_snat:
+    title: SNAT
+    description: Secure Network Address Translation maps the source client IP address in a request to a translation address defined on the BIG-IP device.
+    type: boolean
+  snat_automap:
+    title: SNAT Automap
+    description: SNAT automap uses BIG-IP self IP addresses as the translation address.
+    type: boolean
+  make_snatpool:
+    title: Automatically manage the SNAT pool.
+    type: boolean
+    description: If selected the BIG-IP will create and manage a snatpool.  Otherwise, select an existing snatpool.  NOTE The pool must exist in the Common partition.
+  snatpool_name:
+    title: Specify the name of an existing BIG-IP SNAT pool.
+    enumFromBigip: 'ltm/snatpool'
+  snat_addresses:
+    title: SNAT Pool Addresses
   tcp_topology:
     title: Specify the type of network that connects both clients and servers to the BIG-IP system.
   enable_tls_server:
@@ -49,7 +69,7 @@ definitions:
     title: HTTP Compression
     type: boolean
   make_compression_profile:
-    title: Automatically manage the HTTP Compression profile
+    title: Create a profile based on wan-optimized-compression? If not select an existing profile below.
     type: boolean
   compression_profile_name:
     title: Specify the name of an existing BIG-IP HTTP compression profile.
@@ -62,9 +82,31 @@ definitions:
       {{^enable_tls_server}}
         "template": "http",
       {{/enable_tls_server}}
+  app_tls_server_def:
+    template: |
+      {{#enable_tls_server}}
+        "{{app_name:f5:bigip_name}}_tls_server": {
+          "class": "TLS_Server",
+          "certificates": [{ "certificate": "{{app_name:f5:bigip_name}}_certificate" }]
+        },
+        "{{app_name:f5:bigip_name}}_certificate": {
+          "class": "Certificate",
+          "certificate": { "bigip": "{{tls_cert_name:f5:bigip_path}}" },
+          "privateKey": { "bigip": "{{tls_key_name:f5:bigip_path}}" }
+        },
+      {{/enable_tls_server}}
+  app_tls_client_def:
+    template: |
+      {{#enable_tls_client}}
+        {{#make_tls_client_profile}}
+          "{{app_name:f5:bigip_name}}_tls_client": {
+            "class": "TLS_Client"
+          },
+        {{/make_tls_client_profile}}
+      {{/enable_tls_client}}
   app_pool_def:
     template: |
-      "Sharepoint_pool": {
+      "{{app_name:f5:bigip_name}}_pool": {
         "class": "Pool",
         "members": [{
           "serverAddresses": {{pool_members:f5:ipv4_array}},
@@ -73,7 +115,7 @@ definitions:
         }],
         "loadBalancingMode": "least-connections-member",
         "monitors": [{
-          "use": "/{{tenant_name:f5:bigip_name}}/Sharepoint/Sharepoint_monitor"
+          "use": "{{app_name:f5:bigip_name}}_monitor"
         }]
       },
   app_monitor_def:
@@ -83,7 +125,7 @@ definitions:
         "interval": 5,
         "dscp": 0,
         "send": "GET / HTTP/1.1\r\nHost: {{app_fqdn:f5:bigip_name}}\r\nConnection: Close\r\n\r\n",
-        "receive": "X-SharePointHealthScore: [0-5].",
+        "receive": "X-{{app_name:f5:bigip_name}}HealthScore: [0-5].",
         "timeUntilUp": 0,
         "timeout": 16,
         "class": "Monitor",
@@ -96,42 +138,34 @@ definitions:
         "targetAddress": "",
         "targetPort": 0
       },
-  app_accelerate_def:
-    template: |
-      "Sharepoint_cache-optimize": {
-        "parentProfile": {
-          "bigip": "/Common/optimized-caching"
-        },
-        "class": "HTTP_Acceleration_Profile"
-      }
-  app_tls_server_def:
-    template: |
-      {{#enable_tls_server}}
-        "Sharepoint_tls_server": {
-          "class": "TLS_Server",
-          "certificates": [{ "certificate": "Sharepoint_certificate" }]
-        },
-        "Sharepoint_certificate": {
-          "class": "Certificate",
-          "certificate": { "bigip": "{{tls_cert_name:f5:bigip_path}}" },
-          "privateKey": { "bigip": "{{tls_key_name:f5:bigip_path}}" }
-        },
-      {{/enable_tls_server}}
-  app_tls_client_def:
-    template: |
-      {{#enable_tls_client}}
-        {{#make_tls_client_profile}}
-          "Sharepoint_tls_client": {
-            "class": "TLS_Client"
-          },
-        {{/make_tls_client_profile}}
-      {{/enable_tls_client}}
   app_http_def:
     template: |
-        "Sharepoint_http": {
+        "{{app_name:f5:bigip_name}}_http": {
           "class": "HTTP_Profile",
           "xForwardedFor": true
         },
+  app_snatpool_def:
+    template: |
+      {{#enable_snat}}
+        {{^snat_automap}}
+          {{#make_snatpool}}
+            "{{app_name:f5:bigip_name}}_snatpool": {
+              "class": "SNAT_Pool",
+              "snatAddresses": {{snat_addresses:f5:ipv4_array}}
+            },
+          {{/make_snatpool}}
+        {{/snat_automap}}
+      {{/enable_snat}}
+  app_accelerate_def:
+    template: |
+      "{{app_name:f5:bigip_name}}_cache-optimize": {
+        "parentProfile": {
+          "bigip": "/Common/optimized-caching"
+        },
+        "class": "HTTP_Acceleration_Profile",
+        "cacheSize": 10,
+        "maximumObjectSize": 2000000
+      },
   service_type_def:
     template: |
       {{#enable_tls_server}}
@@ -142,17 +176,17 @@ definitions:
       {{/enable_tls_server}}
   service_pool_def:
     template: |
-      "pool": "Sharepoint_pool",
+      "pool": "{{app_name:f5:bigip_name}}_pool",
   service_tls_server_def:
     template: |
       {{#enable_tls_server}}
-        "serverTLS": "Sharepoint_tls_server",
+        "serverTLS": "{{app_name:f5:bigip_name}}_tls_server",
       {{/enable_tls_server}}
   service_tls_client_def:
     template: |
       {{#enable_tls_client}}
         {{#make_tls_client_profile}}
-          "clientTLS": "Sharepoint_tls_client",
+          "clientTLS": "{{app_name:f5:bigip_name}}_tls_client",
         {{/make_tls_client_profile}}
         {{^make_tls_client_profile}}
           "clientTLS": {
@@ -163,8 +197,35 @@ definitions:
   service_http_def:
     template: |
         "profileHTTP": {
-          "use": "Sharepoint_http"
+          "use": "{{app_name:f5:bigip_name}}_http"
         },
+  service_snat_def:
+    template: |
+      {{#enable_snat}}
+        {{#snat_automap}}
+          "snat": "auto",
+        {{/snat_automap}}
+        {{^snat_automap}}
+          {{#make_snatpool}}
+            "snat": {
+              "use": "{{app_name:f5:bigip_name}}_snatpool"
+            },
+          {{/make_snatpool}}
+          {{^make_snatpool}}
+            "snat": {
+              "bigip": { "bigip": "{{snatpool_name:f5:bigip_path}}" }
+            },
+          {{/make_snatpool}}
+        {{/snat_automap}}
+      {{/enable_snat}}
+      {{^enable_snat}}
+        "snat": "none",
+      {{/enable_snat}}
+  service_accelerate_def:
+    template: |
+      "profileHTTPAcceleration": {
+        "use": "{{app_name:f5:bigip_name}}_cache-optimize"
+      },
   service_compression_def:
     template: |
       {{#enable_compression}}
@@ -190,8 +251,11 @@ definitions:
       "ingress": "{{tcp_ingress_topology:f5:topology}}",
       "egress": "{{tcp_egress_topology:f5:topology}}"
 parameters:
-  virtual_port: 443
-  pool_port: 80
+  app_name: "Sharepoint"
+  app_fqdn: ''
+  enable_snat: true
+  snat_automap: true
+  make_snatpool: true
   tcp_topology: lan
   enable_tls_server: true
   enable_tls_client: false
@@ -199,8 +263,11 @@ parameters:
   tls_cert_name: /Common/default.crt
   tls_key_name: /Common/default.key
   tls_client_profile_name: /Common/serverssl
+  snatpool_name: /Common
   tcp_ingress_topology: wan
   tcp_egress_topology: lan
+  virtual_port: 443
+  pool_port: 80
   enable_compression: true
   make_compression_profile: true
   compression_profile_name: /Common/httpcompression
@@ -212,13 +279,15 @@ template: |
     "id": "urn:uuid:a858e55e-bbe6-42ce-a9b9-0f4ab33e3bf7",
     "{{tenant_name:f5:bigip_name}}": {
       "class": "Tenant",
-      "Sharepoint": {
+      "{{app_name:f5:bigip_name}}": {
         "class": "Application",
         {{> app_type_def}}
         {{> app_pool_def}}
         {{> app_tls_server_def}}
         {{> app_tls_client_def}}
         {{> app_http_def}}
+        {{> app_monitor_def}}
+        {{> app_accelerate_def}}
         "serviceMain": {
           "virtualAddresses": ["{{virtual_address:f5:ipv4}}"],
           "virtualPort": {{virtual_port:f5:port}},
@@ -227,15 +296,11 @@ template: |
           {{> service_tls_server_def}}
           {{> service_tls_client_def}}
           {{> service_http_def}}
-          "profileHTTPAcceleration": {
-            "use": "Sharepoint_cache-optimize"
-          },
+          {{> service_accelerate_def}}
           {{> service_compression_def}}
           {{> service_redirect80_def}}
           {{> service_tcp_def}}
-        },
-        {{> app_monitor_def}}
-        {{> app_accelerate_def}}
+        }
       }
     }
   }
