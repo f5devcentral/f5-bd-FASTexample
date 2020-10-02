@@ -74,6 +74,10 @@ definitions:
   compression_profile_name:
     title: Specify the name of an existing BIG-IP HTTP compression profile.
     enumFromBigip: 'ltm/profile/http-compression'
+  enable_multiplex:
+    title: Connection Multiplexing
+    description: Works with HTTP Keep-Alives to allow the BIG-IP system to minimize the number of server-side TCP connections by making existing connections available for reuse by other clients.
+    type: boolean
   app_type_def:
     template: |
       {{#enable_tls_server}}
@@ -238,6 +242,14 @@ definitions:
           },
         {{/make_compression_profile}}
       {{/enable_compression}}
+  service_multiplex_def:
+    template: |
+      {{#enable_multiplex}}
+        "profileMultiplex": "basic",
+        "profileNTLM": {
+          "bigip": "/Common/ntlm"
+        },
+      {{/enable_multiplex}} 
   service_redirect80_def:
     template: |
       {{#enable_tls_server}}
@@ -270,6 +282,7 @@ parameters:
   pool_port: 80
   enable_compression: true
   make_compression_profile: true
+  make_multiplex_profile: true
   compression_profile_name: /Common/httpcompression
   enable_redirect: true
 template: |
@@ -298,6 +311,7 @@ template: |
           {{> service_http_def}}
           {{> service_accelerate_def}}
           {{> service_compression_def}}
+          {{> service_multiplex_def}}
           {{> service_redirect80_def}}
           {{> service_tcp_def}}
         }
