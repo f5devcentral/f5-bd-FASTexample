@@ -198,6 +198,9 @@ definitions:
         "profileHTTP": {
           "use": "{{app_name:f5:bigip_name}}_http"
         },
+  service_persist:
+    template: |
+      "persistenceMethods": [],
   service_snat_def:
     template: |
       {{#enable_snat}}
@@ -305,6 +308,7 @@ template: |
           {{> service_tls_server_def}}
           {{> service_tls_client_def}}
           {{> service_http_def}}
+          {{> service_persist}}
           {{> service_accelerate_def}}
           {{> service_compression_def}}
           {{> service_multiplex_def}}

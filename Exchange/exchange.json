@@ -226,6 +226,7 @@
         "profileHTTP": {
           "use": "Exchange2016_http"
         },
+        "persistenceMethods": [],
         "snat": "auto",
         "profileHTTPAcceleration": {
           "use": "Exchange2016_cache-optimize"
