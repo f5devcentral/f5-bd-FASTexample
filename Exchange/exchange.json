@@ -2,11 +2,11 @@
   "class": "ADC",
   "schemaVersion": "3.0.0",
   "id": "urn:uuid:a858e55e-bbe6-42ce-a9b9-0f4ab33e3bf7",
-  "myapps": {
+  "myapps2": {
     "class": "Tenant",
     "Exchange2016": {
       "class": "Application",
-      "template": "https",
+      "template": "generic",
       "exchangeVS_ad_pool": {
         "class": "Pool",
         "members": [
@@ -173,10 +173,10 @@
       "Exchange2016_certificate": {
         "class": "Certificate",
         "certificate": {
-          "bigip": "/Common/mail.aserracorp.com"
+          "bigip": "/Common/default.crt"
         },
         "privateKey": {
-          "bigip": "/Common/mail.aserracorp.com"
+          "bigip": "/Common/default.key"
         }
       },
       "Exchange2016_tls_client": {
@@ -215,7 +215,7 @@
         "class": "iRule",
         "iRule": "priority 900\nwhen HTTP_REQUEST {\n    if { ([HTTP::uri] == \"/\") } {\n        HTTP::redirect https://[HTTP::host]/owa/\n    }\n}"
       },
-      "serviceMain": {
+      "Exchange2016_vs": {
         "virtualAddresses": [
           "206.124.129.197"
         ],
@@ -232,6 +232,10 @@
         },
         "profileHTTPCompression": {
           "use": "Exchange2016_wan-optimized-compression"
+        },
+        "profileMultiplex": "basic",
+        "profileNTLM": {
+          "bigip": "/Common/ntlm"
         },
         "redirect80": true,
         "iRules": [

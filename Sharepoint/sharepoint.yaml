@@ -80,12 +80,7 @@ definitions:
     type: boolean
   app_type_def:
     template: |
-      {{#enable_tls_server}}
-        "template": "https",
-      {{/enable_tls_server}}
-      {{^enable_tls_server}}
-        "template": "http",
-      {{/enable_tls_server}}
+      "template": "generic",
   app_tls_server_def:
     template: |
       {{#enable_tls_server}}
@@ -302,7 +297,7 @@ template: |
         {{> app_http_def}}
         {{> app_monitor_def}}
         {{> app_accelerate_def}}
-        "serviceMain": {
+        "{{app_name}}_vs": {
           "virtualAddresses": ["{{virtual_address:f5:ipv4}}"],
           "virtualPort": {{virtual_port:f5:port}},
           {{> service_type_def}}

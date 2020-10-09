@@ -71,14 +71,14 @@ definitions:
     title: Specify the name of an existing BIG-IP serverssl profile.
     description: TLS client profiles are of type "ltm serverssl" on BIG-IP.
     enumFromBigip: 'ltm/profile/server-ssl'
-  tcp_ingress_topology:
-    title: Specify the type of network that connects clients to the BIG-IP system
-  tcp_egress_topology:
-    title: Specify the type of network that connects servers to the BIG-IP system
   enable_multiplex:
     title: Connection Multiplexing
     description: Works with HTTP Keep-Alives to allow the BIG-IP system to minimize the number of server-side TCP connections by making existing connections available for reuse by other clients.
     type: boolean
+  tcp_ingress_topology:
+    title: Specify the type of network that connects clients to the BIG-IP system
+  tcp_egress_topology:
+    title: Specify the type of network that connects servers to the BIG-IP system
   owa:
     title: Are you deploying Outlook Web App (includes ECP)?
     description: Select if you are deploying the BIG-IP system for Outlook Web App, including the Exchange Control Panel (ECP) at this time. You can always reconfigure this template at another time to add or remove Outlook Web App from the configuration.
@@ -116,12 +116,7 @@ definitions:
     type: boolean
   app_type_def:
     template: |
-      {{#enable_tls_server}}
-        "template": "https",
-      {{/enable_tls_server}}
-      {{^enable_tls_server}}
-        "template": "http",
-      {{/enable_tls_server}}
+        "template": "generic",
   app_tls_server_def:
     template: |
       {{#enable_tls_server}}
@@ -708,7 +703,7 @@ template: |
         {{> app_compression_def}}
         {{> app_irule_combined_def}}
         {{> app_irule_owa_def}}
-        "serviceMain": {
+        "{{app_name}}_vs": {
           "virtualAddresses": ["{{virtual_address:f5:ipv4}}"],
           "virtualPort": {{virtual_port:f5:port}},
           {{> service_type_def}}
