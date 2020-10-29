@@ -278,10 +278,6 @@ parameters:
   tcp_egress_topology: lan
   virtual_port: 443
   pool_port: 80
-  enable_compression: true
-  enable_mutliplex: true
-  make_compression_profile: true
-  make_multiplex_profile: true
   compression_profile_name: /Common/httpcompression
   enable_redirect: true
 template: |
