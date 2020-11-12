@@ -93,11 +93,11 @@ definitions:
     type: boolean
   outlookMAPI:
     title: Will Outlook clients use MAPI-over-HTTP to connect to Exchange?
-    description: 	The iApp needs to know if Microsoft Outlook clients use MAPI-over-HTTP, RPC-over-HTTP, or both to connect to Microsoft Exchange so it can create the appropriate BIG-IP objects. Select the answer that best describes your implementation.     
+    description: 	The template needs to know if Microsoft Outlook clients use MAPI-over-HTTP, RPC-over-HTTP, or both to connect to Microsoft Exchange so it can create the appropriate BIG-IP objects. Select the answer that best describes your implementation.     
     type: boolean
   outlookRPC:
     title: Will Outlook clients use RPC-over-HTTP to connect to Exchange?
-    description: 	The iApp needs to know if Microsoft Outlook clients use MAPI-over-HTTP, RPC-over-HTTP, or both to connect to Microsoft Exchange so it can create the appropriate BIG-IP objects. Select the answer that best describes your implementation.     
+    description: 	The template needs to know if Microsoft Outlook clients use MAPI-over-HTTP, RPC-over-HTTP, or both to connect to Microsoft Exchange so it can create the appropriate BIG-IP objects. Select the answer that best describes your implementation.     
     type: boolean
   activesync: 
     title: Are you deploying ActiveSync?
