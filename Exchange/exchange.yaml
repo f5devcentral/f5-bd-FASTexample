@@ -115,6 +115,10 @@ definitions:
     title: Are you deploying IMAP4?
     description: Select whether you are deploying the BIG-IP system for POP3 at this time. You can always reconfigure this template at another time to add or remove POP3 from the configuration. 	You must enable IMAP4 on each of your Exchange Mailbox Servers before that service will be available. IMAP4 is not enabled by default on Exchange Mailbox Servers.
     type: boolean
+  eav:
+    title: Do you want to create external monitors for client access services? If not, standard monitors will be utilized.
+    description: 	By default, the iApp creates the Microsoft-recommended Managed Availability monitors. You can choose to have the iApp also create External monitors, which use SNMP queries to check the status of five services critical to proper Exchange functionality. SNMP must be enabled on each Exchange server in the pool. More information about these services is available in the Exchange iApp deployment guide.
+    type: boolean
   app_type_def:
     template: |
         "template": "generic",
@@ -157,9 +161,21 @@ definitions:
         {{^pool_customize}}
         "loadBalancingMode": "least-connections-member",
         {{/pool_customize}}
-        "monitors": [{
-          "use": "exchangeVS_ad_https_monitor"
-        }]
+        "monitors": [
+        {{#eav}}
+          {
+            "use": "exchangeVS_ad_https_monitor"
+          },
+          {
+            "use": "exchangeVS_ad_snmp_monitor"
+          }
+        {{/eav}}
+        {{^eav}}
+          {
+            "use": "exchangeVS_ad_https_monitor"
+          }
+        {{/eav}}
+        ]
       },
      {{/autodiscover}}
   app_autodiscover_monitor_def:
@@ -183,6 +199,20 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_ad_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ad_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/autodiscover}}
   app_activesync_pool_def:
     template: |
@@ -201,9 +231,21 @@ definitions:
           {{^pool_customize}}
           "loadBalancingMode": "least-connections-member",
           {{/pool_customize}}
-          "monitors": [{
-            "use": "exchangeVS_as_https_monitor"
-          }]
+          "monitors": [
+            {{#eav}}
+              {
+                "use": "exchangeVS_as_https_monitor"
+              },
+              {
+                "use": "exchangeVS_as_snmp_monitor"
+              }
+            {{/eav}}
+            {{^eav}}
+              {
+                "use": "exchangeVS_as_https_monitor"
+              }
+            {{/eav}}
+          ]
         },
       {{/activesync}}
   app_activesync_monitor_def:
@@ -227,6 +269,20 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_as_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/as_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/activesync }}
   app_ews_pool_def:
     template: |
@@ -245,9 +301,21 @@ definitions:
           {{^pool_customize}}
           "loadBalancingMode": "least-connections-member",
           {{/pool_customize}}
-          "monitors": [{
-            "use": "exchangeVS_ews_https_monitor"
-          }]
+          "monitors": [
+            {{#eav}}
+              {
+                "use": "exchangeVS_ews_https_monitor"
+              },
+              {
+                "use": "exchangeVS_ews_snmp_monitor"
+              }
+            {{/eav}}
+            {{^eav}}
+              {
+                "use": "exchangeVS_ews_https_monitor"
+              }
+            {{/eav}}
+          ]
         },
       {{/ews}}
   app_ews_monitor_def:
@@ -271,6 +339,20 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_ews_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ews_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/ews}}
   app_imap_pool_def:
     template: |
@@ -289,9 +371,21 @@ definitions:
         {{^pool_customize}}
         "loadBalancingMode": "least-connections-member",
         {{/pool_customize}}
-        "monitors": [{
-          "use": "exchangeVS_imap_monitor"
-        }]
+        "monitors": [
+          {{#eav}}
+            {
+              "use": "exchangeVS_imap_snmp_monitor"
+            },  
+            {
+              "use": "exchangeVS_imap_{{mailbox:f5:bigip_name}}_eav_monitor"
+            }
+          {{/eav}}
+          {{^eav}}
+            {
+              "use": "exchangeVS_imap_monitor"
+            }
+          {{/eav}}
+        ]
       },
      {{/imap4}}
   app_imap_monitor_def:
@@ -310,7 +404,67 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_imap_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_eav.sh"
+            }
+          },
+          "exchangeVS_imap_{{mailbox:f5:bigip_name}}_eav_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_adv_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/imap4}}
+  app_pop3_pool_def:
+    template: |
+     {{#pop3}}
+      "exchangeVS_pop3_pool": {
+        "class": "Pool",
+        "members": [{
+          "serverAddresses": {{pool_members:f5:ipv4_array}},
+          "servicePort": {{pool_port:f5:port}},
+          "shareNodes": true
+        }],
+        {{#pool_customize}}
+        "loadBalancingMode": "{{load_balancing_mode:f5:load_balancing_mode}}",
+        "slowRampTime": {{slow_ramp_time::integer}},
+        {{/pool_customize}}
+        {{^pool_customize}}
+        "loadBalancingMode": "least-connections-member",
+        {{/pool_customize}}
+        "monitors": [
+          {{#eav}}
+            {
+              "use": "exchangeVS_pop3_snmp_monitor"
+            },
+            {
+              "use": "exchangeVS_pop3_{{mailbox:f5:bigip_name}}_eav_monitor"
+            }
+          {{/eav}}
+          {{^eav}}
+            {
+              "use": "exchangeVS_pop3_monitor"
+            }           
+          {{/eav}}
+        ]
+      },
+     {{/pop3}}
   app_pop3_monitor_def:
     template: |
       {{#pop3}}
@@ -327,6 +481,32 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_pop3_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_eav.sh"
+            }
+          },
+          "exchangeVS_pop3_{{mailbox:f5:bigip_name}}_eav_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_adv_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/pop3}}
   app_mapi_pool_def:
     template: |
@@ -346,9 +526,21 @@ definitions:
           {{^pool_customize}}
           "loadBalancingMode": "least-connections-member",
           {{/pool_customize}}
-          "monitors": [{
-            "use": "exchangeVS_mapi_https_monitor"
-          }]
+          "monitors": [
+          {{#eav}}
+            {
+              "use": "exchangeVS_mapi_https_monitor"
+            },
+            {
+              "use": "exchangeVS_mapi_snmp_monitor"
+            }
+          {{/eav}}
+          {{^eav}}
+            {
+              "use": "exchangeVS_mapi_https_monitor"
+            }
+          {{/eav}}
+          ]
         },
         {{/outlookMAPI}}
       {{/outlook}}
@@ -374,6 +566,20 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_mapi_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/mapi_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/outlookMAPI}}
       {{/outlook}}
   app_oa_pool_def:
@@ -394,9 +600,21 @@ definitions:
         {{^pool_customize}}
         "loadBalancingMode": "least-connections-member",
         {{/pool_customize}}
-        "monitors": [{
-          "use": "exchangeVS_oa_https_monitor"
-        }]
+        "monitors": [
+          {{#eav}}
+            {
+              "use": "exchangeVS_oa_https_monitor"
+            },
+            {
+              "use": "exchangeVS_oa_snmp_monitor"
+            }
+          {{/eav}}
+          {{^eav}}
+            {
+              "use": "exchangeVS_oa_https_monitor"
+            }
+          {{/eav}}
+        ]
       },
       {{/outlookRPC}}
       {{/outlook}}  
@@ -422,6 +640,20 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_oa_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/oa_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/outlookRPC}}
       {{/outlook}}
   app_owa_pool_def:
@@ -441,9 +673,21 @@ definitions:
         {{^pool_customize}}
         "loadBalancingMode": "least-connections-member",
         {{/pool_customize}}
-        "monitors": [{
-          "use": "exchangeVS_owa_https_monitor"
-        }]
+        "monitors": [
+          {{#eav}}
+            {
+              "use": "exchangeVS_owa_https_monitor"
+            },
+            {
+              "use": "exchangeVS_owa_snmp_monitor"
+            }
+          {{/eav}}
+          {{^eav}}
+            {
+              "use": "exchangeVS_owa_https_monitor"
+            }
+          {{/eav}}
+        ]
       },
      {{/owa}}
   app_owa_monitor_def:
@@ -467,29 +711,21 @@ definitions:
           "targetAddress": "",
           "targetPort": 0 
         },
+        {{#eav}}
+          "exchangeVS_owa_snmp_monitor": {
+            "adaptive": false,
+            "interval": 30,
+            "dscp": 0,
+            "timeUntilUp": 0,
+            "timeout": 91,
+            "class": "Monitor",
+            "monitorType": "external",
+            "script": {
+            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/owa_eav.sh"
+            }
+          },
+        {{/eav}}
       {{/owa}}
-  app_pop3_pool_def:
-    template: |
-     {{#pop3}}
-      "exchangeVS_pop3_pool": {
-        "class": "Pool",
-        "members": [{
-          "serverAddresses": {{pool_members:f5:ipv4_array}},
-          "servicePort": {{pool_port:f5:port}},
-          "shareNodes": true
-        }],
-        {{#pool_customize}}
-        "loadBalancingMode": "{{load_balancing_mode:f5:load_balancing_mode}}",
-        "slowRampTime": {{slow_ramp_time::integer}},
-        {{/pool_customize}}
-        {{^pool_customize}}
-        "loadBalancingMode": "least-connections-member",
-        {{/pool_customize}}
-        "monitors": [{
-          "use": "exchangeVS_pop3_monitor"
-        }]
-      },
-     {{/pop3}}
   app_http_def:
     template: |
         "{{app_name:f5:bigip_name}}_http": {
@@ -726,6 +962,7 @@ parameters:
   outlookRPC: false
   activesync: true
   autodiscover: true
+  eav: false
 template: |
   {
     "class": "ADC",
