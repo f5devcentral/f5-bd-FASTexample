@@ -209,7 +209,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ad_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ad_eav.sh"
             }
           },
         {{/eav}}
@@ -279,7 +279,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/as_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/as_eav.sh"
             }
           },
         {{/eav}}
@@ -349,7 +349,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ews_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/ews_eav.sh"
             }
           },
         {{/eav}}
@@ -414,7 +414,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_eav.sh"
             }
           },
           "exchangeVS_imap_{{mailbox:f5:bigip_name}}_eav_monitor": {
@@ -426,7 +426,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_adv_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/imap_adv_eav.sh"
             }
           },
         {{/eav}}
@@ -491,7 +491,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_eav.sh"
             }
           },
           "exchangeVS_pop3_{{mailbox:f5:bigip_name}}_eav_monitor": {
@@ -503,7 +503,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_adv_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/pop3_adv_eav.sh"
             }
           },
         {{/eav}}
@@ -576,7 +576,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/mapi_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/mapi_eav.sh"
             }
           },
         {{/eav}}
@@ -650,7 +650,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/oa_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/oa_eav.sh"
             }
           },
         {{/eav}}
@@ -721,7 +721,7 @@ definitions:
             "class": "Monitor",
             "monitorType": "external",
             "script": {
-            "url": https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/owa_eav.sh"
+            "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/Exchange/owa_eav.sh"
             }
           },
         {{/eav}}
