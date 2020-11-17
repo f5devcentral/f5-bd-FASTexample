@@ -53,8 +53,6 @@ definitions:
   snatpool_name:
     title: Specify the name of an existing BIG-IP SNAT pool.
     enumFromBigip: 'ltm/snatpool'
-  snat_addresses:
-    title: SNAT Pool Addresses
   pool_members:
     title: Pool Members
     description: Specify the IP address(es) of your AD FS servers. If you have existing nodes on this BIG-IP system, you can select them from the list, otherwise type the addresses. Click Add to include additional servers.
