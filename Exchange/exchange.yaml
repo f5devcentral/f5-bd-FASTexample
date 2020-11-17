@@ -1218,7 +1218,7 @@ parameters:
   as _fqdn: 'example.mycompany.com'
   ad_fqdn: 'example.mycompany.com'
   eav: false
-  single_vip: true
+  single_vip: false
   enable_snat: true
   snat_automap: true
   make_snatpool: true
