@@ -141,7 +141,7 @@ definitions:
           "class": "Monitor",
           "monitorType": "external",
           "script": {
-          "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/adfs/eav_scripts/adfs_eav.sh"
+          "url": "https://raw.githubusercontent.com/f5devcentral/f5-bd-FASTexample/master/ADFS/eav_scripts/adfs_eav.sh"
             }
           },
       {{/create_monitor}}
