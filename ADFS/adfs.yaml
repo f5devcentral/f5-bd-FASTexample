@@ -177,18 +177,6 @@ definitions:
           "class": "HTTP_Profile",
           "xForwardedFor": true
         },
-  app_snatpool_def:
-    template: |
-      {{#enable_snat}}
-        {{^snat_automap}}
-          {{#make_snatpool}}
-            "{{app_name:f5:bigip_name}}_snatpool": {
-              "class": "SNAT_Pool",
-              "snatAddresses": {{snat_addresses:f5:ipv4_array}}
-            },
-          {{/make_snatpool}}
-        {{/snat_automap}}
-      {{/enable_snat}}
   app_tcp_monitor_def:
     template: |
       {{#client_cert}}
